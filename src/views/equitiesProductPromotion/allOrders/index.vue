@@ -1,7 +1,7 @@
 <template>
   <!-- 全部订单 -->
-  <div class="order-container">
-    <div class="order-filter">
+  <div class="list-container">
+    <div class="list-filter">
       <el-form
         ref="filterform"
         :model="form"
@@ -138,7 +138,7 @@
         </el-form-item>
       </el-form>
     </div>
-    <div class="order-table">
+    <div class="list-table">
       <div class="table-tools">
         <span style="margin-right: 10px">批量操作</span>
         <el-button
@@ -1337,7 +1337,7 @@ export default class extends Vue {
 </script>
 
 <style lang="scss">
-.order {
+.list {
   &-container {
     margin: 20px;
   }
