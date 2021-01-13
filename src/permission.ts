@@ -30,7 +30,8 @@ router.beforeEach(async (to: Route, _: Route, next: any) => {
           await PermissionModule.GenerateRoutes({ path })
           router.addRoutes(PermissionModule.addRouters)
           if (to.path === '' || to.path === '/') {
-            next({ path: firstPath, replace: true })
+            // next({ path: firstPath, replace: true }) // 注释动态路由跳转，实际开发中请打开
+            next({ path: 'components', replace: true }) // 组件展示，实际开发中注释
           } else {
             next({ ...to, replace: true }) // hack方法 确保addRoutes已完成 ,set the replace: true so the navigation will not leave a history record
           }

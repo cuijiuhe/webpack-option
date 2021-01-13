@@ -26,54 +26,54 @@ export const constantRouterMap: any[] = [
       hidden: true
     }
   },
-  // {
-  //   path: '/404',
-  //   component: () => import(/* webpackChunkName: "404" */ '@/views/404.vue'),
-  //   meta: { hidden: true }
-  // },
-  // {
-  //   path: '/equitiesProductPromotion',
-  //   component: Layout,
-  //   redirect: '/equitiesProductPromotion/productpopularization',
-  //   meta: {
-  //     title: '权益产品推广',
-  //     icon: 'nested',
-  //     fontSize: '16px',
-  //     marginBottom: '-4px'
-  //   },
-  //   children: [
-  //     {
-  //       path: 'productpopularization',
-  //       component: () => import(/* webpackChunkName: "productpopularization" */ '@/views/equitiesProductPromotion/productpopularization/index.vue'),
-  //       meta: {
-  //         title: '推广产品',
-  //         icon: 'jewelry',
-  //         fontSize: '20px',
-  //         marginBottom: '-4px'
-  //       }
-  //     },
-  //     {
-  //       path: 'allOrders',
-  //       component: () => import(/* webpackChunkName: "allOrders" */ '@/views/equitiesProductPromotion/allOrders/index.vue'),
-  //       meta: {
-  //         title: '全部订单',
-  //         icon: 'order',
-  //         fontSize: '20px',
-  //         marginBottom: '-4px'
-  //       }
-  //     },
-  //     {
-  //       path: 'dataAnalysis',
-  //       component: () => import(/* webpackChunkName: "dataAnalysis" */ '@/views/equitiesProductPromotion/dataAnalysis/index.vue'),
-  //       meta: {
-  //         title: '数据分析',
-  //         icon: 'tradingvolume',
-  //         fontSize: '20px',
-  //         marginBottom: '-4px'
-  //       }
-  //     },
-  //   ]
-  // },
+  {
+    path: '/404',
+    component: () => import(/* webpackChunkName: "404" */ '@/views/404.vue'),
+    meta: { hidden: true }
+  },
+  {
+    path: '/components',
+    component: Layout,
+    redirect: '/components/table',
+    meta: {
+      title: '功能页面',
+      icon: 'nested',
+      fontSize: '16px',
+      marginBottom: '-4px'
+    },
+    children: [
+      {
+        path: 'table',
+        component: () => import(/* webpackChunkName: "productpopularization" */ '@/views/components/table/index.vue'),
+        meta: {
+          title: '表格',
+          icon: 'jewelry',
+          fontSize: '20px',
+          marginBottom: '-4px'
+        }
+      },
+      {
+        path: 'form',
+        component: () => import(/* webpackChunkName: "allOrders" */ '@/views/components/form/index.vue'),
+        meta: {
+          title: '表单',
+          icon: 'order',
+          fontSize: '20px',
+          marginBottom: '-4px'
+        }
+      },
+      {
+        path: 'detail',
+        component: () => import(/* webpackChunkName: "dataAnalysis" */ '@/views/components/detail/index.vue'),
+        meta: {
+          title: '详情',
+          icon: 'tradingvolume',
+          fontSize: '20px',
+          marginBottom: '-4px'
+        }
+      },
+    ]
+  }
 ]
 
 export default new Router({
