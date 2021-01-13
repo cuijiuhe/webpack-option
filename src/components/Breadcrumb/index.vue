@@ -73,7 +73,6 @@ export default class extends Vue {
   }
 
   private handleLink(item: any) {
-    console.log(item);
     const { redirect, path } = item
     if (redirect) {
       this.$router.push(redirect)
