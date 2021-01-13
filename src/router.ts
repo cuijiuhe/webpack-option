@@ -27,8 +27,18 @@ export const constantRouterMap: any[] = [
     }
   },
   {
+    path: '/',
+    redirect: '/components',
+    meta: { hidden: true }
+  },
+  {
     path: '/404',
     component: () => import(/* webpackChunkName: "404" */ '@/views/404.vue'),
+    meta: { hidden: true }
+  },
+  {
+    path: '*',
+    redirect: '/404',
     meta: { hidden: true }
   },
   {
