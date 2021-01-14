@@ -39,3 +39,26 @@ export const deleteProduct = (productId: string) =>
     url: `/product/deleteProduct/${productId}`,
     method: 'get'
   })
+
+  //添加产品类型下拉
+  export const queryProductConfigurationType = (data: any) =>
+  request({
+    url: '/businessType/queryProductConfigurationType',
+    method: 'post',
+    data: data
+  })
+  //根据产品类型查询产品编码和产品名称
+  export const queryAccordingToProduct = (data: any) =>
+  request({
+    url: '/productdictionary/queryAccordingToProduct',
+    method: 'post',
+    data: data
+  })
+  //产品类型查询条件下拉
+  export const queryProductConfiguration = (data: any) =>
+  request({
+    url: '/businessType/queryProductConfiguration',
+    method: 'post',
+    data: data
+  })
+  

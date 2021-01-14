@@ -1,217 +1,89 @@
 <template>
-  <!-- 全部订单 -->
-  <div class="list-container">
-    <div class="list-filter">
-      <el-form
-        ref="filterform"
-        :model="form"
-        label-width="left"
-        size="small"
-        :inline="true"
-        label-position="left"
-      >
-        <el-form-item label="订单编号" prop="orderNum">
+  <!-- 推广产品 -->
+  <div class="order-container">
+    <div class="order-filter">
+      <el-form :model="form" label-width="left" size="small" :inline="true" label-position="left">
+        <el-form-item label="产品名称">
           <el-input
-            v-model="form.orderNum"
+            v-model="form.searchParam.productName"
             suffix-icon="el-icon-date"
-            placeholder="请输入订单编号"
+            placeholder="请输入产品名称"
             clearable
           ></el-input>
         </el-form-item>
-        <el-form-item label="推广产品" prop="clientName">
+
+        <el-form-item label="产品编码/ID">
           <el-input
-            v-model="form.productName"
+            v-model="form.searchParam.productCode"
             suffix-icon="el-icon-date"
-            placeholder="请输入推广产品名称"
+            placeholder="请输入产品编码"
             clearable
           ></el-input>
         </el-form-item>
-        <el-form-item label="产品编码" prop="spreaderName">
-          <el-input
-            v-model="form.productNum"
-            suffix-icon="el-icon-date"
-            placeholder="输请输入编码/ID"
-            clearable
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="订单渠道" prop="channelSource">
-          <el-select
-            v-model="form.channelSource"
-            placeholder="请选择"
-            clearable
-          >
+
+        <el-form-item label="推广状态">
+          <el-select v-model="form.searchParam.productStatus " placeholder="请选择" clearable>
             <el-option
-              v-for="item in channel_code"
+              v-for="item in product_status"
               :key="item.guid"
               :label="item.text"
               :value="item.key"
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="订单状态" prop="vehicleType">
-          <el-select v-model="form.orderStatus" placeholder="请选择" clearable>
+        <el-form-item label="产品类型">
+          <el-select v-model="form.searchParam.promoType " placeholder="请选择" clearable>
             <el-option
-              v-for="item in order_status"
-              :key="item.guid"
-              :label="item.text"
-              :value="item.key"
+              v-for="item in getFilterProductTypeArr"
+              :key="item.businesstypeName"
+              :label="item.businesstypeName"
+              :value="item.typeIdentifier"
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="推广人" prop="vehicleNo">
-          <el-input
-            v-model="form.customerName"
-            suffix-icon="el-icon-date"
-            placeholder="姓名/手机号/推广码"
-            clearable
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="审核状态" prop="orderChannel">
-          <el-select
-            v-model="form.cashStatus"
-            placeholder="请选择"
-            style="width: 100%"
-            clearable
-          >
-            <el-option
-              v-for="item in cash_status"
-              :key="item.guid"
-              :label="item.text"
-              :value="item.key"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="驳回原因" prop="failReason">
-          <el-select
-            v-model="form.failReason"
-            placeholder="请选择"
-            style="width: 100%"
-            clearable
-          >
-            <el-option
-              v-for="item in rejection_reason"
-              :key="item.guid"
-              :label="item.text"
-              :value="item.key"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="会员编码" prop="payMember">
-          <el-input
-            v-model="form.payMember"
-            suffix-icon="el-icon-date"
-            placeholder="请输入会员编码"
-            clearable
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="会员手机号" prop="memberPhone">
-          <el-input
-            v-model="form.memberPhone"
-            suffix-icon="el-icon-date"
-            placeholder="请输入会员手机号"
-            clearable
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="下单时间" prop="applyDate">
-          <el-date-picker
-            v-model="orderTime"
-            value-format="yyyy-MM-dd"
-            type="daterange"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-          ></el-date-picker>
-        </el-form-item>
-        <el-form-item label="业务审核时间" prop="workAuditTime">
-          <el-date-picker
-            v-model="businessReviewTime"
-            value-format="yyyy-MM-dd"
-            type="daterange"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-          ></el-date-picker>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="getList">搜索</el-button>
-          <el-button plain @click="clearFilterList">重置</el-button>
-        </el-form-item>
+
+        <el-button type="primary" style="margin-bottom: 20px;" size="small" @click="getList()">查询</el-button>
       </el-form>
     </div>
-    <div class="list-table">
+    <!-- 列表 -->
+    <div class="order-table">
       <div class="table-tools">
-        <span style="margin-right: 10px">批量操作</span>
-        <el-button
-          v-checkbtn="['business_pass_btn']"
-          type="primary"
-          size="small"
-          @click="businessAudit"
-          >业务通过</el-button
-        >
-        <el-button
-          v-checkbtn="['business_rejection_btn']"
-          type="danger"
-          size="small"
-          @click="reviewRejected"
-          >业务驳回</el-button
-        >
-        <el-button
-          v-checkbtn="['success_transfer_btn']"
-          type="primary"
-          size="small"
-          @click="transferSuccessful"
-          >转账成功</el-button
-        >
-        <el-button
-          v-checkbtn="['financial_rejection_btn']"
-          type="danger"
-          size="small"
-          @click="financeRejected"
-          >财务驳回</el-button
-        >
-        <el-button type="primary" size="small" @click="exportDataList"
-          >导出报表</el-button
-        >
+        <el-button type="primary" size="small" @click="addPromotionalProducts">添加</el-button>
       </div>
-      <!-- 列表 -->
       <el-table
-        :header-cell-style="{ background: '#eef1f6', color: '#606266' }"
-        fit
         :data="tableData"
         border
-        @selection-change="handleSelectionChange"
-        ref="multipleTable"
         stripe
-        v-loading="listLoading"
-        row-key="withdrawalId"
-        default-expand-all
-        :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
+        :header-cell-style="{background:'#eef1f6',color:'#606266'}"
+        fit
+        max-height="540"
       >
+        v-loading="listLoading"
+        height="400px"
+        >
         <el-table-column
+          prop="promoType"
+          label="产品类型"
           align="center"
-          type="selection"
-          fixed
-        ></el-table-column>
+          :show-overflow-tooltip="true"
+        >
+          <template slot-scope="scope">
+            {{formatPromoType(scope.row.promoType)}}
+          </template>
+        </el-table-column>
         <el-table-column
-          prop="orderNum"
-          label="订单编号"
-          width="140"
+          prop="productName"
+          label="产品名称"
+          width="280"
           align="center"
           :show-overflow-tooltip="true"
         ></el-table-column>
         <el-table-column
-          prop="withdrawalNum"
-          label="提现流水号"
-          width="100"
-          align="center"
           :show-overflow-tooltip="true"
-        ></el-table-column>
-        <el-table-column
-          prop="withdrawTime"
-          label="提现时间"
-          width="150"
+          prop="productCode"
+          label="产品ID"
+          width="90"
           align="center"
-          :show-overflow-tooltip="true"
         ></el-table-column>
         <el-table-column
           :show-overflow-tooltip="true"
@@ -220,317 +92,77 @@
           width="120"
           align="center"
         ></el-table-column>
-        <el-table-column
-          :show-overflow-tooltip="true"
-          prop="productName"
-          label="产品名称"
-          width="150"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          :show-overflow-tooltip="true"
-          prop="paymentAmount"
-          label="实付金额"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          :show-overflow-tooltip="true"
-          prop="orderStatus"
-          label="订单状态"
-          align="center"
-        >
-          <template slot-scope="scope">{{
-            scope.row.orderStatus | checkBaseData(order_status, order_status)
-          }}</template>
-        </el-table-column>
-        <el-table-column
-          :show-overflow-tooltip="true"
-          prop="orderTime"
-          label="下单时间"
-          align="center"
-          width="150"
-        ></el-table-column>
-        <el-table-column
-          :show-overflow-tooltip="true"
-          prop="payTime"
-          label="支付时间"
-          align="center"
-          width="150"
-        ></el-table-column>
 
         <el-table-column
           :show-overflow-tooltip="true"
-          prop="payMember"
-          label="会员编码"
-          width="90"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          :show-overflow-tooltip="true"
-          prop="memberPhone"
-          label="会员手机号"
-          width="110"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          :show-overflow-tooltip="true"
-          prop="memberName"
-          label="会员姓名"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          :show-overflow-tooltip="true"
-          prop="cashStatus"
-          label="审核状态"
+          prop="excitationType"
+          label="激励方式"
           align="center"
         >
-          <template slot-scope="scope">
-            <!-- 失效原因补充 -->
-            <el-popover trigger="hover" placement="top">
-              <p
-                style="text-align: center"
-                v-if="scope.row.reasonForInvalidAudit"
-              >
-                失效原因：{{ scope.row.reasonForInvalidAudit }}
-              </p>
-              <p style="text-align: center" v-else>
-                {{
-                  scope.row.cashStatus | checkBaseData(cash_status, cash_status)
-                }}
-              </p>
-              <div slot="reference" class="name-wrapper">
-                <el-tag size="medium">{{
-                  scope.row.cashStatus | checkBaseData(cash_status, cash_status)
-                }}</el-tag>
-              </div>
-            </el-popover>
-          </template>
+          <template
+            slot-scope="scope"
+          >{{scope.row.excitationType | checkBaseData(excitation_type, excitation_type)}}</template>
         </el-table-column>
         <el-table-column
           :show-overflow-tooltip="true"
-          prop="withdrawBonus"
-          label="预估佣金"
+          prop="rewardMoneyShow"
+          label="佣金"
           align="center"
-        ></el-table-column>
+        >
+          <!-- <template slot-scope="scope">{{scope.row.channel | checkBaseData(channel, channel)}}</template> -->
+          <!-- <template
+            slot-scope="scope"
+          >{{scope.row.channel == 1 ? '区分渠道' : (scope.row.productChannelVo.length ? scope.row.productChannelVo[0].rewardMoney : '' )}}</template>-->
+        </el-table-column>
         <el-table-column
           :show-overflow-tooltip="true"
-          prop="transferAmount"
-          label="实付佣金"
+          prop="productStatus"
+          label="推广状态"
           align="center"
-        ></el-table-column>
-        <el-table-column
-          width="90"
-          prop="channelSource"
-          label="推广渠道"
-          align="center"
-          :show-overflow-tooltip="true"
-        ></el-table-column>
+        >
+          <template
+            slot-scope="scope"
+          >{{scope.row.productStatus | checkBaseData(product_status, product_status)}}</template>
+        </el-table-column>
         <el-table-column
           :show-overflow-tooltip="true"
-          prop="customerName"
-          label="推广人"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          :show-overflow-tooltip="true"
-          prop="idCard"
-          label="推广人身份证号码"
-          width="160"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          :show-overflow-tooltip="true"
-          prop="promoPhone"
-          label="推广人电话"
-          width="110"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          prop="spreaderEnterprise"
-          label="推广人所属企业"
-          width="120"
-          align="center"
-          :show-overflow-tooltip="true"
-        ></el-table-column>
-        <el-table-column
-          prop="operationTime"
-          label="业务审核时间"
+          prop="createrTime"
+          label="发布时间"
           width="150"
           align="center"
+        ></el-table-column>
+        <el-table-column
           :show-overflow-tooltip="true"
-        ></el-table-column>
-        <el-table-column
-          prop="failReason"
-          label="业务驳回原因"
-          width="110"
-          align="center"
-          :show-overflow-tooltip="true"
-        ></el-table-column>
-        <el-table-column
-          prop="operationReplenishReason"
-          label="业务补充说明"
-          width="110"
-          align="center"
-          :show-overflow-tooltip="true"
-        ></el-table-column>
-        <el-table-column
-          prop="transferSuccessTime"
-          label="财务审核时间"
-          width="140"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          prop="failTransferReason"
-          label="财务驳回原因"
-          width="110"
-          :show-overflow-tooltip="true"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          prop="financReplenishReason"
-          label="财务补充说明"
-          width="110"
-          align="center"
-          :show-overflow-tooltip="true"
-        ></el-table-column>
-        <el-table-column
-          prop="accountType"
-          label="账户类型"
-          align="center"
-          :show-overflow-tooltip="true"
-        ></el-table-column>
-        <el-table-column
-          prop="bankCardNum"
-          label="账号"
-          width="170"
-          align="center"
-          :show-overflow-tooltip="true"
-        ></el-table-column>
-        <el-table-column
-          prop="openingBank"
-          label="银行开户行"
+          prop="updateTime"
+          label="修改时间"
           width="150"
           align="center"
-          :show-overflow-tooltip="true"
         ></el-table-column>
-        <el-table-column fixed="right" label="操作" align="center" width="160">
+        <el-table-column fixed="right" label="操作" width="180">
           <template slot-scope="scope">
+            <el-button type="text" size="medium" @click="viewDetails(scope.row.productId)">查看</el-button>
+            <el-button type="text" size="medium" @click="modifyDialog(scope.row.productId)">修改</el-button>
             <el-button
-              v-if="
-                scope.row.cashStatus == 1
-                  ? true
-                  : scope.row.cashStatus == -1
-                  ? false
-                  : scope.row.cashStatus == 3
-                  ? false
-                  : scope.row.cashStatus == 5
-                  ? false
-                  : scope.row.cashStatus == 4
-                  ? false
-                  : scope.row.cashStatus == 6
-                  ? false
-                  : scope.row.cashStatus == 7
-                  ? false
-                  : scope.row.cashStatus == 2
-                  ? false
-                  : scope.row.cashStatus == 0
-                  ? false
-                  : true
-              "
-              v-checkbtn="['business_pass_btn']"
               type="text"
-              size="mini"
-              @click="businessAudit(scope.row)"
-              >业务通过</el-button
-            >
+              size="medium"
+              @click="endDialog(scope.row.productId, '2')"
+              v-if="scope.row.productStatus == 1"
+            >结束</el-button>
             <el-button
-              v-if="
-                scope.row.cashStatus == 1
-                  ? true
-                  : scope.row.cashStatus == -1
-                  ? false
-                  : scope.row.cashStatus == 3
-                  ? false
-                  : scope.row.cashStatus == 5
-                  ? false
-                  : scope.row.cashStatus == 4
-                  ? false
-                  : scope.row.cashStatus == 6
-                  ? false
-                  : scope.row.cashStatus == 7
-                  ? false
-                  : scope.row.cashStatus == 2
-                  ? false
-                  : scope.row.cashStatus == 0
-                  ? false
-                  : true
-              "
-              v-checkbtn="['business_rejection_btn']"
               type="text"
-              size="mini"
-              @click="reviewRejected(scope.row)"
-              >业务驳回</el-button
-            >
-            <el-button
-              v-if="
-                scope.row.cashStatus == 1
-                  ? false
-                  : scope.row.cashStatus == -1
-                  ? false
-                  : scope.row.cashStatus == 3
-                  ? false
-                  : scope.row.cashStatus == 5
-                  ? false
-                  : scope.row.cashStatus == 4
-                  ? false
-                  : scope.row.cashStatus == 6
-                  ? false
-                  : scope.row.cashStatus == 7
-                  ? false
-                  : scope.row.cashStatus == 2
-                  ? true
-                  : false
-              "
-              v-checkbtn="['success_transfer_btn']"
-              type="text"
-              size="mini"
-              @click="transferSuccessful(scope.row)"
-              >转账成功</el-button
-            >
-            <el-button
-              v-if="
-                scope.row.cashStatus == 1
-                  ? false
-                  : scope.row.cashStatus == -1
-                  ? false
-                  : scope.row.cashStatus == 3
-                  ? false
-                  : scope.row.cashStatus == 5
-                  ? false
-                  : scope.row.cashStatus == 4
-                  ? false
-                  : scope.row.cashStatus == 6
-                  ? false
-                  : scope.row.cashStatus == 7
-                  ? false
-                  : scope.row.cashStatus == 2
-                  ? true
-                  : false
-              "
-              v-checkbtn="['financial_rejection_btn']"
-              type="text"
-              size="mini"
-              @click="financeRejected(scope.row)"
-              >财务驳回</el-button
-            >
+              size="medium"
+              @click="endDialog(scope.row.productId, '1')"
+              v-if="scope.row.productStatus == 2"
+            >启动</el-button>
+            <el-button type="text" size="medium" @click="deleteDialog(scope.row.productId)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
-      <!-- 分页 -->
+
       <div class="table-pagination">
         <el-pagination
           :total="total"
-          :page-size="form.pageSize"
+          :page-size="form.size"
           :page-sizes="[10, 20, 30, 40]"
           background
           layout="total, sizes, prev, pager, next"
@@ -539,285 +171,270 @@
         />
       </div>
     </div>
-
-    <!-- 业务通过 -->
+    <!-- 添加推广产品对话框 -->
     <el-dialog
-      @close="dialogClose"
-      title="业务审核通过"
-      :visible.sync="businessAuditDialog"
+      @closed="dialogClosed"
+      title="添加推广产品"
+      :visible.sync="dialogFormVisible"
+      :close-on-click-modal="false"
     >
+      <el-form
+        :model="addForm"
+        :inline="true"
+        :label-position="labelPosition"
+        size="small"
+        ref="addForm"
+        :rules="rules"
+      >
+      <el-row>
+        <el-col :span='12'>
+          <el-form-item label="产品类型" :label-width="formLabelWidth">
+              <el-select v-model="addForm.promoType" @change="choseType" placeholder="请选择产品类型">
+                <el-option
+                  v-for="item in selectProductType"
+                  :key="item.businesstypeName"
+                  :label="item.businesstypeName"
+                  :value="item.typeIdentifier"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+        </el-col>
+      </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="产品编码" :label-width="formLabelWidth" prop="productCode">
+              <el-select v-model="addForm.productCode" @input="productCodeChange" placeholder="请选择">
+                <el-option
+                  v-for="item in product_code"
+                  :key="item.guid"
+                  :label="item.key"
+                  :value="item.key"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="产品名称" :label-width="formLabelWidth" prop="productName">
+              <el-input class="size-input" v-model="addForm.productName"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="状态" :label-width="formLabelWidth" prop="productStatus">
+              <el-select class="size-input" v-model="addForm.productStatus" placeholder="请选择">
+                <el-option
+                  v-for="item in product_status"
+                  :key="item.guid"
+                  :label="item.text"
+                  :value="item.key"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="url" :label-width="formLabelWidth">
+              <el-input class="size-input" v-model="addForm.productUrl"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-form-item label="推广描述" :label-width="formLabelWidth">
+          <el-input maxlength="50" style="width:660px;" v-model="addForm.productDesc"></el-input>
+        </el-form-item>
+
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="激励方式" :label-width="formLabelWidth" prop="excitationType">
+              <el-select
+                @change="excitationChange"
+                class="size-input"
+                v-model="addForm.excitationType"
+                placeholder="请选择"
+              >
+                <el-option
+                  v-for="item in excitation_type"
+                  :key="item.guid"
+                  :label="item.text"
+                  :value="item.key"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="是否区分用户渠道奖励" :label-width="formLabelWidth" prop="channel">
+              <el-radio-group v-model="addForm.channel" @change="differentiateChannels">
+                <el-radio :label="1">是</el-radio>
+                <el-radio :label="2">否</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row v-if="addForm.channel == 1">
+          <el-form-item  v-for="(item, index) in filteredType" :key="index + item.channelName" :label="item.channelName" :label-width="formLabelWidth">
+            <el-input class="size-input" v-model="item.rewardMoney"></el-input>
+          </el-form-item>
+        </el-row>
+        <el-row v-else>
+            <el-col :span="12" v-for="(item,index) in addForm.channelVoList" :key="item.guid">
+              <el-form-item
+                :label="item.channelName"
+                :label-width="formLabelWidth"
+                :prop="'channelVoList.' +index+ '.rewardMoney'"
+              >
+                <el-input
+                  :placeholder="placeholderCotent"
+                  type="number"
+                  class="size-input"
+                  v-model="item.rewardMoney"
+                ></el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        <el-row>
+          <!-- <el-col :span="12" v-if="addForm.channel == 2">
+            <el-form-item
+              v-for="(item,index) in addForm.channelVoList"
+              :key="item.guid"
+              :label="item.channelName"
+              :label-width="formLabelWidth"
+              :prop="'channelVoList.'+index+ '.rewardMoney'"
+            >
+              <el-input
+                :placeholder="placeholderCotent"
+                type="number"
+                class="size-input"
+                v-model="item.rewardMoney"
+              ></el-input>
+            </el-form-item>
+          </el-col> -->
+
+
+
+          <!-- <div v-else>
+            <el-col :span="12" v-for="(item,index) in addForm.channelVoList" :key="item.guid">
+              <el-form-item
+                :label="item.channelName"
+                :label-width="formLabelWidth"
+                :prop="'channelVoList.' +index+ '.rewardMoney'"
+              >
+                <el-input
+                  :placeholder="placeholderCotent"
+                  type="number"
+                  class="size-input"
+                  v-model="item.rewardMoney"
+                ></el-input>
+              </el-form-item>
+            </el-col>
+          </div> -->
+          <el-col :span="11">
+            <el-form-item label="结算标准" :label-width="formLabelWidth" prop="settlementStandard">
+              <el-select class="size-input" v-model="addForm.settlementStandard" placeholder="请选择">
+                <el-option
+                  v-for="item in settlement_standard"
+                  :key="item.guid"
+                  :label="item.text"
+                  :value="item.key"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="结算周期" :label-width="formLabelWidth" prop="settlementCycle">
+              <el-input class="size-input" v-model="addForm.settlementCycle" placeholder="天"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="addPromoteProducts('addForm')" size="small">保 存</el-button>
+        <el-button @click="dialogFormVisible = false" size="small">取 消</el-button>
+      </div>
+    </el-dialog>
+    <!-- 查看详情对话框 -->
+    <el-dialog @closed="dialogClosed" width="50%" title="推广详情" :visible.sync="dialogTableVisible">
+      <el-row>
+        <el-col>
+          <div class="dynamic-tips">
+            <i class="el-icon-warning"></i>
+            当前产品状态在{{productDetail.productStatus | checkBaseData(product_status, product_status)}}
+          </div>
+        </el-col>
+        <el-col class="details-content">产品名称： {{productDetail.productName}}</el-col>
+        <!-- <el-col class="details-content">产品编码： {{productDetail.productCode | checkBaseData(product_code, product_code)}}</el-col> -->
+        <el-col class="details-content">产品编码： {{productDetail.productNum}}</el-col>
+        <el-col
+          class="details-content"
+        >激励方式： {{productDetail.excitationType | checkBaseData(excitation_type, excitation_type)}}</el-col>
+        <el-col
+          class="details-content"
+        >佣金是否区分渠道：{{productDetail.channel | checkBaseData(channel, channel)}}</el-col>
+        <el-col
+          class="details-content"
+          v-for="(item,index) in channelVoList"
+          :key="index"
+        >{{item.channelName}}：{{item.rewardMoney}}</el-col>
+        <el-col class="details-content">url：{{productDetail.productUrl}}</el-col>
+        <el-col
+          class="details-content"
+        >推广状态：{{productDetail.productStatus | checkBaseData(product_status, product_status)}}</el-col>
+        <el-col
+          class="details-content"
+        >结算标准：{{productDetail.settlementStandard | checkBaseData(settlement_standard, settlement_standard)}}</el-col>
+        <el-col class="details-content">结算周期：{{productDetail.settlementCycle}}</el-col>
+        <el-col class="details-content">描述：{{productDetail.productDesc}}</el-col>
+      </el-row>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialogTableVisible = false" size="small">确 定</el-button>
+        <el-button @click="dialogTableVisible = false" size="small">取 消</el-button>
+      </div>
+    </el-dialog>
+    <!-- 修改 -->
+    <el-dialog :visible.sync="dialogVisible" width="30%">
       <div class="icon-box">
         <i class="el-icon-warning"></i>
       </div>
       <div class="text-content">
-        <span>确定要通过对以下{{ this.gridData.length }}个订单的业务审核?</span>
+        <span>进行中的推广请慎重修改</span>
         <br />
-        <span>如操作错误,可通过驳回操作改判</span>
+        <span>修改后会影响后续产生的推广订单</span>
+        <br />
+        <span>确定要继续执行该操作吗？</span>
       </div>
-      <el-table :data="gridData">
-        <el-table-column
-          :show-overflow-tooltip="true"
-          property="orderNum"
-          label="ID"
-          width="250"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          property="customerName"
-          label="推荐人"
-          width="150"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          property="withdrawBonus"
-          label="预估奖励"
-          width="150"
-          align="center"
-        ></el-table-column>
-      </el-table>
-      <template v-if="this.invalidStatus.length == 0 ? false : true">
-        <p style="margin: 10px 0 10px 0">
-          以下{{ this.invalidStatus.length }}条由于审核状态不正确,
-          无法进行业务审核通过操作
-        </p>
-        <el-table :data="invalidStatus">
-          <el-table-column
-            :show-overflow-tooltip="true"
-            property="orderNum"
-            label="ID"
-            width="250"
-            align="center"
-          ></el-table-column>
-          <el-table-column
-            property="customerName"
-            label="推荐人"
-            width="150"
-            align="center"
-          ></el-table-column>
-          <el-table-column
-            property="withdrawBonus"
-            label="预估奖励"
-            width="150"
-            align="center"
-          ></el-table-column>
-        </el-table>
-      </template>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="determine">确 定</el-button>
-        <el-button @click="businessAuditDialog = false">取 消</el-button>
+        <el-button type="primary" @click="showModifyDialog" size="small">确 定</el-button>
+        <el-button @click="dialogVisible = false" size="small">取 消</el-button>
       </span>
     </el-dialog>
-    <!-- 业务驳回 -->
-    <el-dialog
-      @close="dialogClose"
-      title="业务驳回"
-      :visible.sync="reviewRejectedDialog"
-    >
+    <!-- 结束 -->
+    <el-dialog :visible.sync="dialogEnd" width="30%">
       <div class="icon-box">
         <i class="el-icon-warning"></i>
       </div>
       <div class="text-content">
-        <span>确定要通过对以下{{ this.gridData.length }}个订单的业务审核?</span>
+        <span class="end-text">结束后的推广，产生后的订单将自动失效</span>
+        <span class="end-text">不在进行奖励</span>
         <br />
-        <span>如操作错误,可通过驳回操作改判</span>
-      </div>
-      <el-table :data="gridData">
-        <el-table-column
-          :show-overflow-tooltip="true"
-          property="orderNum"
-          label="ID"
-          width="250"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          property="customerName"
-          label="推荐人"
-          width="150"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          property="withdrawBonus"
-          label="预估奖励"
-          width="150"
-          align="center"
-        ></el-table-column>
-      </el-table>
-      <template v-if="this.invalidStatus.length == 0 ? false : true">
-        <p style="margin: 10px 0 10px 0">
-          以下{{ this.invalidStatus.length }}, 条由于审核状态不正确,
-          无法进行业务审核驳回操作
-        </p>
-        <el-table :data="invalidStatus">
-          <el-table-column
-            :show-overflow-tooltip="true"
-            property="orderNum"
-            label="ID"
-            width="250"
-            align="center"
-          ></el-table-column>
-          <el-table-column
-            property="customerName"
-            label="推荐人"
-            width="150"
-            align="center"
-          ></el-table-column>
-          <el-table-column
-            property="withdrawBonus"
-            label="预估奖励"
-            width="150"
-            align="center"
-          ></el-table-column>
-        </el-table>
-      </template>
-
-      <div style="margin: 10px 0 10px 0">
-        驳回原因：
-        <el-select
-          v-model="reasonsForRejection"
-          @change="rejectChange"
-          placeholder="请选择"
-        >
-          <el-option
-            v-for="item in rejection_reason"
-            :key="item.guid"
-            :label="item.text"
-            :value="item.text"
-          ></el-option>
-        </el-select>
-      </div>
-      <div v-if="this.flag">
-        补充说明：
-        <el-input
-          @blur="rejectInputMethod"
-          style="width: 600px"
-          v-model="rejectInput"
-          placeholder="请描述具体原因"
-        ></el-input>
+        <span class="end-text">确定要继续结束推广码？</span>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="determine">确 定</el-button>
-        <el-button @click="reviewRejectedDialog = false">取 消</el-button>
+        <el-button type="primary" @click="endConfirmation" size="small">确 定</el-button>
+        <el-button @click="dialogEnd = false" size="small">取 消</el-button>
       </span>
     </el-dialog>
-    <!-- 财务驳回 -->
-    <el-dialog
-      @close="dialogClose"
-      title="财务驳回"
-      :visible.sync="financeRejectedDialog"
-    >
+    <!-- 删除 -->
+    <el-dialog :visible.sync="dialogDelete" width="30%">
       <div class="icon-box">
         <i class="el-icon-warning"></i>
       </div>
       <div class="text-content">
-        <span
-          >确定要通过对以下{{
-            this.transferApproval.length
-          }}个订单的财务驳回审核?</span
-        >
+        <span>确定要删除吗</span>
         <br />
-        <span>如操作错误,可通过驳回操作改判</span>
-      </div>
-      <el-table :data="transferApproval">
-        <el-table-column
-          :show-overflow-tooltip="true"
-          property="orderNum"
-          label="ID"
-          width="250"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          property="customerName"
-          label="推荐人"
-          width="150"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          property="withdrawBonus"
-          label="预估奖励"
-          width="150"
-          align="center"
-        ></el-table-column>
-      </el-table>
-      <template v-if="this.invalidStatus.length == 0 ? false : true">
-        <p style="margin: 10px 0 10px 0">
-          以下{{ this.invalidStatus.length }}条由于审核状态不正确,
-          无法进行财务驳回操作
-        </p>
-        <el-table :data="invalidStatus">
-          <el-table-column
-            :show-overflow-tooltip="true"
-            property="orderNum"
-            label="ID"
-            width="250"
-            align="center"
-          ></el-table-column>
-          <el-table-column
-            property="customerName"
-            label="推荐人"
-            width="150"
-            align="center"
-          ></el-table-column>
-          <el-table-column
-            property="withdrawBonus"
-            label="预估奖励"
-            width="150"
-            align="center"
-          ></el-table-column>
-        </el-table>
-      </template>
-
-      <div style="margin: 10px 0 10px 0">
-        驳回原因：
-        <el-select
-          @change="financeRejectionChange"
-          v-model="rejectionInputRejection"
-          placeholder="请选择"
-        >
-          <el-option
-            v-for="item in rejection_reason"
-            :key="item.guid"
-            :label="item.text"
-            :value="item.text"
-          ></el-option>
-        </el-select>
-      </div>
-      <div v-if="financeFlag">
-        补充说明：
-        <el-input
-          @blur="financeRejectionBlur"
-          style="width: 600px"
-          v-model="rejectionInput"
-          placeholder="请描述具体原因"
-        ></el-input>
+        <span>删除操作无法撤销,确定要删除吗</span>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="determine">确 定</el-button>
-        <el-button @click="financeRejectedDialog = false">取 消</el-button>
-      </span>
-    </el-dialog>
-    <!-- 转账成功 -->
-    <el-dialog
-      @close="dialogClose"
-      :visible.sync="transferSuccessfulDialog"
-      width="30%"
-    >
-      <div class="icon-box">
-        <i class="el-icon-success"></i>
-      </div>
-      <div class="text-content">
-        <span class="text-title">操作成功!</span>
-        <br />
-        <span style="font-size: 6px"
-          >{{ this.transferApproval.length }}条数据批量审核通过</span
-        >
-        <br />
-        <span style="font-size: 6px"
-          >{{ this.invalidStatus.length }}条数据未通过财务批量审核</span
-        >
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="determine">确 定</el-button>
-        <el-button @click="transferSuccessfulDialog = false">取 消</el-button>
+        <el-button type="primary" @click="removeProduct" size="small">确 定</el-button>
+        <el-button @click="dialogDelete = false" size="small">取 消</el-button>
       </span>
     </el-dialog>
   </div>
@@ -828,118 +445,563 @@ import { Component, Vue, Watch } from "vue-property-decorator";
 import { Form as ElForm } from "element-ui";
 import { UserModule } from "@/store/modules/user";
 import { exportRafficData } from "@/api/common";
-import { getexportRafficData } from "@/api/order";
-import { getDictionaryList } from "@/api/common";
-import qs from "qs";
-
 import {
-  getOrderList, // 订单列表查询
-  exportOrdersList, // 订单列表统计查询导出
-  orderBusApprove, // 业务审批通过或驳回
-  orderFinanceApprove, // 转账成功或驳回
-  statisticsQuery, // 统计查询
-  exportStatisticsQuery, //  统计查询导出
-} from "@/api/allOrder";
+  getProductList,
+  getDetailByProductList,
+  addProduct,
+  changeProductStatus,
+  deleteProduct,
+  queryProductConfigurationType,
+  queryAccordingToProduct,
+  queryProductConfiguration
+} from "@/api/equitesProduct";
+
+import { getDictionaryList } from "@/api/common";
+
+declare module "vue/types/vue" {
+  interface Vue {
+    [type: string]: any;
+  }
+}
 
 @Component({
-  name: "Table",
+  name: "productpopularization",
 })
 export default class extends Vue {
   // 查询参数
   private form = {
-    orderNum: "", // 订单编号
-    productName: "", //推广产品名称
-    productNum: "", // 产品编码ID
-    payMember: "", // 购买人会员号
-    memberPhone: "", // 购买人手机号
-    channelSource: "", // 订单渠道
-    orderStatus: "", // 订单状态
-    customerName: "", // 推广人
-    cashStatus: "", //审核状态
-    failReason: "", // 驳回原因
-    orderTimeStart: "", // 下单开始时间
-    orderTimeEnd: "", // 下单结束时间
-    operationTimeStart: "", // 审核开始时间
-    operationTimeEnd: "", // 审核结束时间
-    lists: "", // 列表订单编号
+    current: 1,
+    searchParam: {
+      productCode: "",
+      productName: "",
+      productStatus: "",
+      promoType: ""
+    },
+    size: 20,
   };
-  private reasonsForRejection = ""; // 驳回弹窗内的驳回原因下拉
-  private rejectInput = "";
-  private rejectInputValue = "";
-  private rejectionInputRejection = "";
-  private rejectionInput = "";
-  private rejectionInputValue = "";
-  private current = 1;
-  private size = 10;
-  private orderTime: any[] = []; // 下单时间
-  private businessReviewTime: any[] = []; //申请结束时间
-  private gridData: any[] = []; // 业务审核成功状态值
-  private invalidStatus: any[] = []; // 业务审核失败状态值
-  private transferApproval: any[] = []; // 转账成功状态值
-  // 字典状态
-  channel_code = []; //渠道
-  rejection_reason = []; //驳回原因
-  order_status = []; // 订单状态
-  cash_status = []; // 提现审核状态
-  private businessAuditDialog = false;
-  private reviewRejectedDialog = false;
-  private financeRejectedDialog = false;
-  private transferSuccessfulDialog = false;
-  private flag = false;
-  private financeFlag = false;
-  private total: number = 0;
-  private tableData = [];
-  private listLoading = true;
-  private operationStatus = 0;
+  channel_code: object[] = [];
+  channelVoList: object[] = [];
+  noVoList: object[] = [];
+  // 添加推广产品
+  private addForm: any = {
+    /*
+      channel (integer, optional): 是否区分渠道 1是 2否 ,
+      channelVoList (Array[渠道], optional): 渠道集合 ,
+      deleteFlag (integer, optional): 1-未删除，2-删除 ,
+      excitationType (integer, optional): 激励方式1 固定金额 2 实付金额 ,
+      productCode (string, optional): 产品编码 ,
+      productDesc (string, optional): 产品推广描述 ,
+      productId (integer, optional),
+      productName (string, optional): 产品名称 ,
+      productStatus (integer, optional): 0 未开始 1进行中 2已停止 ,
+      productType (string, optional): 产品类型 付费会员； ETC ,
+      productUrl (string, optional): 活动地址 ,
+      settlementCycle (integer, optional): 结算周期 单位天 ,
+      settlementStandard (integer, optional): 结算标准 根据产品类型去查询,不同的类型 标准不一样settlementStandard
+    */
+    productName: "",
+    productCode: "",
+    productStatus: "",
+    productUrl: "",
+    productDesc: "",
+    excitationType: "",
+    channel: 1,
+    settlementCycle: "",
+    settlementStandard: "",
+    promoType: "",//产品类型
+    channelVoList: this.channelVoList,
+  };
+  productDetail: object = {};
+  // 推广状态
+  product_status = [];
+  private dialogFormVisible = false; // 添加
+  private dialogTableVisible = false; // 查看详情
+  private dialogVisible = false; // 修改
+  private dialogEnd = false; // 结束
+  private dialogDelete = false; // 删除
+  private labelPosition = "top";
+  private productId = "";
+  private placeholderCotent = "";
+  private endId: any = "";
+  private endStatus: any = "";
+  private addNum = 0;
+  excitation_type = [];
+  settlement_standard = [];
+  channel = [];
+  product_code = [];
+  private singleChannel = []; // 缓存单渠道
+  private multiChannel = []; // 缓存多渠道
+  selectProductType:any = [];
+  chosedProductType:any = [];// 选完产品类型后过滤出的服务商
 
+  filteredType:any = []//匹配之后需要渲染的列表
+  getFilterProductTypeArr: any = []//产品类型筛选条件
+  commission = (rule: any, value: any, callback: any) => {
+    if (!value) {
+      return callback(new Error("佣金不能为空"));
+    }
+    if (typeof value !== "number" && isNaN(value)) {
+      callback(new Error("佣金是数字"));
+    }
+    callback();
+  };
+  checkAge = (rule: any, value: any, callback: any) => {
+    if (!value) {
+      return callback(new Error("周期天数不能为空"));
+    }
+    if (typeof value !== "number" && isNaN(value)) {
+      callback(new Error("周期天数是数字"));
+    }
+    callback();
+  };
+  private rules: any = {
+    productName: [
+      { required: true, message: "请输入产品名称", trigger: "blur" },
+      { min: 2, max: 50, message: "请输入2-50个汉字", trigger: "blur" },
+    ],
+    productCode: [{ required: true, message: "请选择状态", trigger: "change" }],
+    productStatus: [
+      { required: true, message: "请选择状态", trigger: "change" },
+    ],
+    settlementStandard: [
+      { required: true, message: "请选择结算标准", trigger: "change" },
+    ],
+    // productUrl: [
+    //   { required: true, message: "请输入url", trigger: "blur" },
+    //   { min: 1, max: 190000, message: "请输入url", trigger: "blur" },
+    // ],
+    // productDesc: [
+    //   { required: true, message: "请输入描述信息", trigger: "blur" },
+    //   { min: 5, max: 50, message: "请输入5-50个汉字", trigger: "blur" },
+    // ],
+    excitationType: [
+      { required: true, message: "请选择激励方式", trigger: "change" },
+    ],
+    channel: [
+      {
+        required: true,
+        message: "请选择是否区分用户渠道奖励",
+        trigger: "change",
+      },
+    ],
+    settlementCycle: [{ validator: this.checkAge, trigger: "blur" }],
+  };
+  private total: number = 0;
+  // 列表
+  private tableData = [];
+  private formLabelWidth = "80px";
+  private size = "padding-left:50px";
+  private listLoading = false;
+  //
   mounted() {
+    this.fetchDictionaryList("product_status");
+    this.fetchDictionaryList("excitation_type");
+    this.fetchDictionaryList("settlement_standard");
+    this.fetchDictionaryList("channel");
+    this.fetchDictionaryList("product_code");
     this.fetchDictionaryList("channel_code");
-    this.fetchDictionaryList("rejection_reason");
-    this.fetchDictionaryList("order_status");
-    this.fetchDictionaryList("cash_status");
-    this.getTime();
+    this.filterList();
+    this.getProductType();
+    this.getFilterProductType();
+  }
+  @Watch("addForm.channelVoList")
+  getChannelVoList(newVal: any) {
+    newVal.forEach((item: any, index: number) => {
+      let a = "channelVoList." + `${index}` + ".rewardMoney";
+      this.rules[a] = [{ validator: this.commission, trigger: "blur" }];
+    });
+  }
+
+  choseType(val:any){
+    console.log(typeof(val))
+    // chosedProductType
+    let choseArr:any = [];
+    console.log(this.selectProductType)
+    this.selectProductType.forEach((item:any)=>{
+      if(val == item.typeIdentifier){
+        this.chosedProductType = item.authorizedChannel;
+        // this.addForm.settlementStandard = item.settlementTime;
+        let chosedObjs:any = []
+        this.settlement_standard.forEach((jtem:any)=>{
+          if(item.settlementTime == jtem.key){
+            chosedObjs.push(jtem)
+            this.settlement_standard = chosedObjs;
+            this.addForm.settlementStandard = jtem.key;
+          }
+        })
+      }
+    })
+    
+    let lastChoseArr:any = [];
+    this.channel_code.forEach((item:any)=>{
+      this.chosedProductType.forEach((jtem:any)=>{
+        if(item.text == jtem){
+          let obj:any = {
+            channelCode: `0${item.key}`,
+            channelId: null,
+            channelName: item.text,
+            productId: null,
+            rewardMoney: ''
+          }
+          lastChoseArr.push(obj);
+        }
+      })
+    })
+    this.filteredType = lastChoseArr;
+    this.addForm.channelVoList = lastChoseArr
+
+ //带出产品编码和产品名称
+
+    if(typeof(val)=='string'){
+      this.getTpyeNames(val); 
+    }
+  }
+  formatPromoType(promoTypes: any){
+    // let retArr:any = '';
+    // this.getFilterProductTypeArr.forEach((item:any)=>{
+    //   if(promoTypes == item.typeIdentifier){
+    //     retArr = item.businesstypeName;
+    //   }
+    // })
+    // return retArr;
+
+
+
+    let newRetArr = this.getFilterProductTypeArr.filter((item:any)=>{
+      return item.typeIdentifier == promoTypes;
+    })
+    return newRetArr[0].businesstypeName;
+  }
+  async getTpyeNames(vals: any){
+    const { data } = await queryAccordingToProduct({
+      typeIdentifier: vals
+    })
+    console.log(data.data)
+    let newTypeNames = data.data;
+    if(newTypeNames){
+      let codeNameArr:any = [];
+      newTypeNames.forEach((item:any)=>{
+        // if(vals == item.promoType){
+          codeNameArr.push(
+            {key: item.productCode, text: item.productName}
+          )
+          this.addForm.productCode = item.productCode;
+          this.addForm.productName = item.productName;
+        // }
+      })
+      this.product_code = codeNameArr;
+    }
+  }
+  // 获取字典项
+  private async fetchDictionaryList(type: any) {
+    const _self = this;
+    const { data } = await getDictionaryList({
+      type,
+    });
+    _self[type] = data.data.map((item: any) => {
+      if (Number(item.key)) {
+        item.key = Number(item.key);
+      }
+      if (type === "product_status") {
+        item.key = item.key.toString();
+      }
+      return item;
+    });
+    if (type === "channel_code") {
+      this.dictionaryConversion(_self[type]);
+    }
+
+    // let a = this.channel_code.map((item: any) => {
+    //   let text = item.text,
+    //     key = item.key === "00" ? item.key : "0" + item.key;
+    //   item = { channelName: text, channelCode: key };
+    //   this.$set(item, "rewardMoney", "");
+    //   return item;
+    // });
+    // let b = a.filter((item: any) => {
+    //   if (item.channelCode !== 0) {
+    //     item.channelName = item.channelName + "佣金";
+    //   }
+    //   return item.channelCode !== 6;
+    // });
+    // this.channelVoList = b.filter((item: any) => {
+    //   return (
+    //     item.channelCode == "02" ||
+    //     item.channelCode == "03" ||
+    //     item.channelCode == "04" ||
+    //     item.channelCode == "05"
+    //   );
+    // });
+    // this.noVoList = b.filter((item: any) => {
+    //   if (item.channelCode == "00") {
+    //     item.channelName = "佣金";
+    //     return item.channelCode == "00";
+    //   }
+    // });
+  }
+  // 抽离字典数据处理
+  private dictionaryConversion(val: any) {
+    let a = val.map((item: any) => {
+      let text = item.text,
+        key = item.key === "00" ? item.key : "0" + item.key;
+      item = { channelName: text, channelCode: key };
+      this.$set(item, "rewardMoney", "");
+      return item;
+    });
+    let b = a.filter((item: any) => {
+      if (item.channelCode !== 0) {
+        item.channelName = item.channelName + "佣金";
+      }
+      return item.channelCode !== 6;
+    });
+    this.channelVoList = b.filter((item: any) => {
+      return (
+        item.channelCode == "02" ||
+        item.channelCode == "03" ||
+        item.channelCode == "04" ||
+        item.channelCode == "05"
+      );
+    });
+    this.noVoList = b.filter((item: any) => {
+      if (item.channelCode == "00") {
+        item.channelName = "佣金";
+        return item.channelCode == "00";
+      }
+    });
+  }
+  // 激励方式下拉change事件
+  private excitationChange(val: any) {
+    if (val == 1) {
+      this.placeholderCotent = "请输入固定金额单位:                         元";
+    } else if (val == 2) {
+      this.placeholderCotent = "请输入实付金额单位:                          %";
+    }
+  }
+  //产品类型筛选条件下拉
+  async getFilterProductType(){
+    const { data } = await queryProductConfiguration({});
+    this.getFilterProductTypeArr = data.data;
+    console.log(this.getFilterProductTypeArr)
+    await this.unshiftAll();
+  }
+  unshiftAll(){
+    this.getFilterProductTypeArr.unshift({businesstypeName: "全部",typeIdentifier: "all"})
+  }
+  // 打开推广产品添加dialog
+  private addPromotionalProducts() {
+    if (this.addNum === 0) {
+      this.fetchDictionaryList("channel_code");
+    } else if (this.addNum == 1) {
+      // 查看
+      this.addForm.channel = 1;
+      this.fetchDictionaryList("channel_code");
+      setTimeout(() => {
+        this.addForm.channelVoList = this.channelVoList;
+      }, 0.2 * 1000);
+    } else if (this.addNum == 2) {
+      // 修改
+      this.fetchDictionaryList("channel_code");
+      setTimeout(() => {
+        this.addForm.channelVoList = this.channelVoList;
+      }, 0.2 * 1000);
+    }
+  this.getProductType();
+    // this.addForm.channel = 1;
+    // if (this.addForm.channel === 1) {
+    //   console.log(555);
+    //   this.fetchDictionaryList("channel_code");
+    //   setTimeout(() => {
+    //     console.log(999);
+    //     this.addForm.channelVoList = this.channelVoList;
+    //   }, 0.2 * 1000);
+    // }
+    this.addForm.productUrl = "";
+    this.addForm.productDesc = "";
+    this.dialogFormVisible = true;
+    this.$nextTick(() => {
+      this.addForm.channelVoList = this.channelVoList;
+      let FormData: any = this.$refs["addForm"];
+      try {
+        FormData.resetFields();
+      } catch (error) {
+        throw error;
+      }
+    });
+  }
+  //调用产品类型接口
+  async getProductType(){
+    const { data } = await queryProductConfigurationType({});
+    this.selectProductType = data.data;
+  }
+  // 提交 添加推广产品
+  private async addPromoteProducts(formName: any) {
+    let FormData: any = this.$refs[formName];
+    FormData.validate(async (valid: any) => {
+      if (valid) {
+        const { data } = await addProduct(this.addForm);
+        this.$message.success(data.message);
+        this.dialogFormVisible = false;
+        this.filterList();
+      } else {
+        console.log("error submit!!");
+        return false;
+      }
+    });
+  }
+  private productCodeChange(val: any) {
+
+    let j: any;
+    j = this.product_code.find((item: any) => {
+      //这里的userList就是上面遍历的数据源
+      return item.key === val; //筛选出匹配数据
+    });
+    this.addForm.productName = j.text;
+  }
+  // 是否区分用户渠道奖励 change
+  private differentiateChannels(i: any) {
+    if (this.addNum === 2) {
+      // 修改
+      if (i === 1) {
+        // console.log(1);
+        // console.log("multiChannel", this.multiChannel);
+        if (this.multiChannel.length !== 0) {
+          // console.log("多渠 道");
+          this.addForm.channelVoList = this.multiChannel;
+        } else {
+          this.fetchDictionaryList("channel_code");
+          setTimeout(() => {
+            this.addForm.channelVoList = this.channelVoList;
+          }, 0.2 * 1000);
+        }
+      } else if (i === 2) {
+        // console.log(2);
+        // console.log("singleChannel", this.singleChannel);
+        if (this.singleChannel.length !== 0) {
+          // console.log("单渠道");
+          this.addForm.channelVoList = this.singleChannel;
+        } else {
+          // console.log("多渠道");
+          this.fetchDictionaryList("channel_code");
+          setTimeout(() => {
+            this.addForm.channelVoList = this.noVoList;
+          }, 0.2 * 1000);
+        }
+      }
+    } else if (this.addNum === 1) {
+      // console.log(3);
+      i != 1
+        ? (this.addForm.channelVoList = this.noVoList)
+        : (this.addForm.channelVoList = this.channelVoList);
+    } else if (this.addNum === 0) {
+      // console.log(4);
+      i != 1
+        ? (this.addForm.channelVoList = this.noVoList)
+        : (this.addForm.channelVoList = this.channelVoList);
+    }
+  }
+  // 推广产品详情 接口
+  private async handleProductDetails(id: string) {
+    let { data } = await getDetailByProductList(id);
+    this.productDetail = data.data;
+    this.channelVoList = data.data.channelVoList;
+    this.addForm = data.data;
+    if (data.data.channelVoList.length === 1) {
+      this.singleChannel = data.data.channelVoList;
+    } else {
+      this.multiChannel = data.data.channelVoList;
+      this.filteredType = data.data.channelVoList;
+    }
+  }
+
+  // 打开推广详情dialog
+  private viewDetails(id: string) {
+    this.addNum = 1;
+    this.dialogTableVisible = true;
+    this.handleProductDetails(id);
+  }
+
+  // 打开修改dialog
+  private modifyDialog(id: string) {
+    this.addNum = 2;
+    this.dialogVisible = true;
+    this.productId = id;
+  }
+
+  // 修改确定 打开推广产品更改dialog并读取数据
+  private showModifyDialog() {
+    this.dialogVisible = false;
+    this.handleProductDetails(this.productId);
+    this.dialogFormVisible = true;
+  }
+
+  // 打开结束dialog
+  private async endDialog(productId: string, status: string) {
+    if (status === "1") {
+      // 启动
+      const { data } = await changeProductStatus(productId, status);
+      let message = data.message;
+      if (message !== "修改成功") {
+        this.$message.error(`操作推广以${message}`);
+      } else {
+        this.$message.success(`操作推广以${message}`);
+      }
+      this.filterList();
+    } else if (status === "2") {
+      this.dialogEnd = true;
+      this.endId = productId;
+      this.endStatus = status;
+      this.filterList();
+    }
+  }
+  // 结束 确定
+  private async endConfirmation() {
+    // { productId, status }: { productId: any, status: any }
+    // let endId = this.endId;
+    // let endStatus = this.endStatus;
+    const { data } = await changeProductStatus(this.endId, this.endStatus);
+    let message = data.message;
+    if (message !== "修改成功") {
+      this.$message.error(`操作推广以${message}`);
+    } else {
+      this.$message.success(`操作推广以${message}`);
+    }
+    this.dialogEnd = false;
     this.filterList();
   }
-  @Watch("orderTime")
-  getOrderTime(newVal: any, oldVal: any) {
-    if (newVal == null) {
-      this.orderTime = [];
-      this.form.orderTimeStart = ""; // 下单开始时间
-      this.form.orderTimeEnd = ""; // 下单结束时间
-    }
+
+  // 打开删除dialog
+  private deleteDialog(id: string) {
+    this.dialogDelete = true;
+    this.productId = id;
   }
-  @Watch("businessReviewTime")
-  getBusinessReviewTime(newVal: any, oldVal: any) {
-    if (newVal == null) {
-      this.businessReviewTime = [];
+
+  // 删除推广产品
+  private async removeProduct() {
+    this.dialogDelete = false;
+    const { data } = await deleteProduct(this.productId);
+    let message = data.message;
+    let code = data.code;
+    if (code === 0) {
+      this.$message.error(`产品${message}`);
+    } else {
+      this.$message.success(`产品${message}`);
     }
+
+    this.filterList();
   }
+
+  // 表格index改变时
+  private handleCurrentChange(val: any) {
+    this.form.current = val;
+    this.filterList();
+  }
+
   // 查询列表数据
   private async filterList() {
-    const _this = this;
-    if (_this.orderTime.toString() !== "") {
-      this.form.orderTimeStart =
-        _this.orderTime[0] == undefined ? "" : this.orderTime[0];
-      this.form.orderTimeEnd =
-        _this.orderTime[1] == undefined ? "" : this.orderTime[1];
-    }
-    if (_this.businessReviewTime.toString() !== "") {
-      this.form.operationTimeStart =
-        _this.businessReviewTime[0] == undefined
-          ? ""
-          : this.businessReviewTime[0];
-      this.form.operationTimeEnd =
-        _this.businessReviewTime[1] == undefined
-          ? ""
-          : this.businessReviewTime[1];
-    }
-    // this.listLoading = false;
-    let obj = {
-      current: this.current,
-      size: this.size,
-      searchParam: this.form,
-    };
-    const { data } = await getOrderList(obj);
+    this.listLoading = false;
+    const _self = this;
+    const { data } = await getProductList(this.form);
+
     this.tableData = data.data;
     this.total = data.total;
     setTimeout(() => {
@@ -948,390 +1010,32 @@ export default class extends Vue {
   }
   // 搜索列表
   private getList() {
-    /*orderTimeStart:"", // 下单开始时间
-    orderTimeEnd:"", // 下单结束时间
-    operationTimeStart:"", // 审核开始时间
-    operationTimeEnd:"", // 审核结束时间*/
-    const _this = this;
-    if (_this.orderTime.toString() !== "") {
-      this.form.orderTimeStart =
-        _this.orderTime[0] == undefined ? "" : this.orderTime[0];
-      this.form.orderTimeEnd =
-        _this.orderTime[1] == undefined ? "" : this.orderTime[1];
-    }
-    if (_this.businessReviewTime.toString() !== "") {
-      this.form.operationTimeStart =
-        _this.businessReviewTime[0] == undefined
-          ? ""
-          : this.businessReviewTime[0];
-      this.form.operationTimeEnd =
-        _this.businessReviewTime[1] == undefined
-          ? ""
-          : this.businessReviewTime[1];
-    }
-    this.current = 1;
+    this.form.current = 1;
     this.filterList();
   }
 
-  // 多选业务通过开启弹窗
-  private businessAudit(el: any) {
-    if (el.cashStatus == 1) {
-      this.gridData.push(el);
-    } else if (this.gridData.length == 0) {
-      this.$message.error({
-        // showClose: true,
-        message: "请选择可以业务审核操作的数据",
-        type: "warning",
-        // offset: 500,
-        duration: 3000,
-      });
-      return;
-    }
-    this.operationStatus = 1;
-    this.businessAuditDialog = true;
-  }
-  // 多选业务驳回开启弹窗
-  private reviewRejected(el: any) {
-    if (el.cashStatus == 1) {
-      this.gridData.push(el);
-    } else if (this.gridData.length == 0) {
-      this.$message.error({
-        // showClose: true,
-        message: "此条数据不能进行业务驳回操作",
-        type: "warning",
-        // offset: 500,
-        duration: 3000,
-      });
-      return;
-    }
-    this.operationStatus = 2;
-    this.reviewRejectedDialog = true;
-  }
-  // 多选业务驳回下拉chenge事件
-  private rejectChange(e: any) {
-    if (e == "其他原因") {
-      this.flag = true;
-    } else {
-      this.flag = false;
-    }
-  }
-  // 补充说明失焦事件
-  private rejectInputMethod(e: any) {
-    this.rejectInputValue = e.target.value;
-  }
-  // 多选批量财务审核弹窗
-  private transferSuccessful(el: any) {
-    if (el.cashStatus == 2) {
-      this.transferApproval.push(el);
-    } else if (this.transferApproval.length == 0) {
-      this.$message.error({
-        // showClose: true,
-        message: "此条数据不能进行财务审核通过操作",
-        type: "warning",
-        // offset: 500,
-        duration: 3000,
-      });
-      return;
-    }
-    this.operationStatus = 3;
-    this.transferSuccessfulDialog = true;
-  }
-  // 批量财务驳回弹窗
-  private financeRejected(el: any) {
-    if (el.cashStatus == 2) {
-      this.transferApproval.push(el);
-    } else if (this.transferApproval.length == 0) {
-      this.$message.error({
-        // showClose: true,
-        message: "此条数据不能进行财务驳回操作",
-        type: "warning",
-        // offset: 500,
-        duration: 3000,
-      });
-      return;
-    }
-    this.operationStatus = 4;
-    this.financeRejectedDialog = true;
-  }
-  // 多选财务驳回下拉chenge事件
-  private financeRejectionChange(e: any) {
-    if (e == "其他原因") {
-      this.financeFlag = true;
-    } else {
-      this.financeFlag = false;
-    }
-  }
-  // 多选财务驳回补充说明失焦事件
-  private financeRejectionBlur(e: any) {
-    this.rejectionInputValue = e.target.value;
-  }
-  // 弹窗确定按钮
-  private async determine() {
-    // 多选业务通过按钮 1
-    // console.log(this.operationStatus);
-    if (this.operationStatus == 1) {
-      let c: any[] = [];
-      this.gridData.forEach((item) => {
-        c.push(item.withdrawalId);
-      });
-      let obj = {
-        withdrawalId: c,
-        rejectReason: "",
-        status: 2,
-      };
-      await orderBusApprove(obj);
-      this.businessAuditDialog = false;
-      this.operationStatus = 0;
-    }
-    // 多选业务驳回按钮 2
-    if (this.operationStatus == 2) {
-      let c: any[] = [];
-      this.gridData.forEach((item) => {
-        c.push(item.withdrawalId);
-      });
-      if (
-        this.rejectInputValue == this.rejectInput &&
-        this.rejectInputValue !== ""
-      ) {
-        let obj = {
-          withdrawalId: c,
-          rejectReason: this.rejectInput,
-          status: 3,
-        };
-        await orderBusApprove(obj);
-        this.reviewRejectedDialog = false;
-        this.operationStatus = 0;
-      } else if (this.reasonsForRejection !== "") {
-        let obj = {
-          withdrawalId: c,
-          rejectReason: this.reasonsForRejection,
-          status: 3,
-        };
-        await orderBusApprove(obj);
-        this.reviewRejectedDialog = false;
-        this.operationStatus = 0;
-      }
-    }
-    // 多选转账成功3
-    if (this.operationStatus == 3) {
-      let c: any[] = [];
-      this.transferApproval.forEach((item) => {
-        c.push(item.withdrawalId);
-      });
-      let obj = {
-        withdrawalId: c,
-        rejectReason: "",
-        status: 6,
-      };
-      await orderFinanceApprove(obj);
-      this.transferSuccessfulDialog = false;
-      this.operationStatus = 0;
-    }
-    // 多选财务驳回4
-    if (this.operationStatus == 4) {
-      let c: any[] = [];
-      this.transferApproval.forEach((item) => {
-        c.push(item.withdrawalId);
-      });
-      if (
-        this.rejectionInputValue == this.rejectionInput &&
-        this.rejectionInputValue !== ""
-      ) {
-        let obj = {
-          withdrawalId: c,
-          rejectReason: this.rejectionInput,
-          status: 7,
-        };
-        // console.log("2", obj);
-        await orderFinanceApprove(obj);
-        this.financeRejectedDialog = false;
-        this.operationStatus = 0;
-      } else if (this.rejectionInputRejection !== "") {
-        let obj = {
-          withdrawalId: c,
-          rejectReason: this.rejectionInputRejection,
-          status: 7,
-        };
-        // console.log("1", obj);
-        await orderFinanceApprove(obj);
-        this.financeRejectedDialog = false;
-        this.operationStatus = 0;
-      }
-    }
-    this.filterList();
-  }
-  // 获取字典项
-  private async fetchDictionaryList(type: any) {
-    const _self = this;
-    const { data } = await getDictionaryList({
-      type,
-    });
-    // console.log(data);
-    // _self[type] = data.data;
-    _self[type] = data.data.filter((item: any, index: number) => {
-      return item.key !== "00";
-    });
-  }
-
-  // 表格的checkbox
-  private handleSelectionChange(val: any) {
-    // console.log(val);
-    let order: any[] = [];
-    this.gridData = [];
-    this.invalidStatus = [];
-    this.transferApproval = [];
-    let a = new Set();
-    let b = new Set();
-    let d = new Set();
-    let c = new Set();
-    val.map((item: any) => {
-      return order.push(item);
-    });
-    order.forEach((item) => {
-      c.add(item.orderNum);
-      if (item.cashStatus == 1) {
-        a.add(item);
-      } else if (item.cashStatus == 2) {
-        d.add(item);
-      } else {
-        b.add(item);
-      }
-    });
-    this.gridData = [...a];
-    this.invalidStatus = [...b];
-    this.transferApproval = [...d];
-    this.form.lists = [...c].toString();
-    // console.log(this.form.lists);
-  }
-
-  // 表格index改变时
-  private handleCurrentChange(val: any) {
-    this.current = val;
-    this.filterList();
-  }
   private selsChange(val: any) {
-    this.size = val;
+    this.form.size = val;
     this.filterList();
   }
-
-  // 报表导出
-  private exportDataList() {
-    const _this = this;
-    if (_this.orderTime.toString() !== "") {
-      this.form.orderTimeStart =
-        _this.orderTime[0] == undefined ? "" : this.orderTime[0];
-      this.form.orderTimeEnd =
-        _this.orderTime[1] == undefined ? "" : this.orderTime[1];
-      // console.log(888);
-    }
-    if (_this.businessReviewTime.toString() !== "") {
-      // console.log(999);
-      this.form.operationTimeStart =
-        _this.businessReviewTime[0] == undefined
-          ? ""
-          : this.businessReviewTime[0];
-      this.form.operationTimeEnd =
-        _this.businessReviewTime[1] == undefined
-          ? ""
-          : this.businessReviewTime[1];
-    }
-    // console.log(this.form);
-
-    location.href = `${exportOrdersList}?${qs.stringify(this.form)}`;
-  }
-
-  // 重置搜索信息
-  private clearFilterList() {
-    // this.orderTime = []; //下单时间
-    this.businessReviewTime = []; //申请结束时间
-    this.form.productName = ""; //推广产品名称
-    this.form.productNum = ""; // 产品编码ID
-    this.form.channelSource = ""; // 订单渠道
-    this.form.orderStatus = ""; // 订单状态
-    this.form.customerName = ""; // 推广人
-    this.form.cashStatus = ""; //审核状态
-    this.form.failReason = ""; // 驳回原因
-    this.form.orderNum = ""; // 订单编号
-    // (this.form.orderTimeStart = ""), // 下单开始时间
-    // (this.form.orderTimeEnd = ""), // 下单结束时间
-    // (this.form.operationTimeStart = ""), // 审核开始时间
-    // (this.form.operationTimeEnd = ""), // 审核结束时间
-    this.size = 10;
-    this.current = 1;
-    this.getList();
-  }
-  // 弹窗关闭的回调
-  private dialogClose() {
-    (this.$refs.multipleTable as any).clearSelection();
-    this.gridData = []; // 业务审核成功状态值
-    this.invalidStatus = []; // 业务审核失败状态值
-    this.transferApproval = []; // 转账成功状态值
-    this.rejectInput = "";
-    this.rejectInputValue = "";
-    this.rejectionInputRejection = "";
-    this.rejectionInput = "";
-    this.rejectionInputValue = "";
-  }
-  // 获取当前时间
-  getTime() {
-    //设置当前时间
-    var date = new Date();
-    var year = date.getFullYear(); //月份从0~11，所以加一
-    var dateArr: any = [
-      date.getMonth() + 1,
-      date.getDate(),
-      date.getHours(),
-      date.getMinutes(),
-      date.getSeconds(),
-    ];
-    for (var i = 0; i < dateArr.length; i++) {
-      if (dateArr[i] >= 1 && dateArr[i] <= 9) {
-        dateArr[i] = "0" + dateArr[i];
+  // 关闭 dialog 回调
+  private dialogClosed() {
+    for (let key in this.addForm) {
+      if (key == "channelVoList") {
+        this.addForm[key] = [];
+      } else {
+        this.addForm[key] = "";
       }
     }
-    var strDate = year + "-" + dateArr[0] + "-" + dateArr[1];
-    // + " " + dateArr[2] + ":" + dateArr[3] +  ":" + dateArr[4];
-
-    this.getPreMonth(strDate);
-    //获取当日
-  }
-  // 即日起获取上个月时间范围
-  getPreMonth(date: any) {
-    var arr = date.split("-");
-    var year = arr[0]; //获取当前日期的年份
-    var month = arr[1]; //获取当前日期的月份
-    var day = arr[2]; //获取当前日期的日
-    var days: any = new Date(year, month, 0);
-    days = days.getDate(); //获取当前日期中月的天数
-    var year2 = year;
-    var month2: any = parseInt(month) - 1;
-    if (month2 == 0) {
-      year2 = parseInt(year2) - 1;
-      month2 = 12;
-    }
-    var day2 = day;
-    var days2: any = new Date(year2, month2, 0);
-    days2 = days2.getDate();
-    if (day2 > days2) {
-      day2 = days2;
-    }
-    if (month2 < 10) {
-      month2 = "0" + month2;
-    }
-    var t2 = year2 + "-" + month2 + "-" + day2;
-    // console.log("当前时间", date);
-    // console.log("时间",t2);
-    this.orderTime.push(t2);
-    this.orderTime.push(date);
-
-    // console.log("默认时间范围", this.orderTime);
-    // return t2;
+    this.channelVoList = [];
+    this.multiChannel = [];
+    this.singleChannel = [];
   }
 }
 </script>
 
 <style lang="scss">
-.list {
+.order {
   &-container {
     margin: 20px;
   }
@@ -1340,7 +1044,7 @@ export default class extends Vue {
     padding: 20px;
     background: #fff;
     margin-bottom: 20px;
-    border-radius: 3px;
+    border-radius: 4px;
   }
 
   &-filter {
@@ -1360,18 +1064,42 @@ export default class extends Vue {
     }
   }
 }
+.el-form-item{
+  margin-right: 20px !important;
+}
+.size-input {
+  width: 300px;
+}
+.from-item-left {
+  padding-left: 50px;
+}
 .table-pagination {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   margin-top: 20px;
 }
-.el-form-item {
-  margin-right: 20px !important;
+
+.dynamic-tips {
+  // width: 400px;
+  padding-left: 20px;
+  color: rgb(73, 157, 242);
+  line-height: 30px;
+  border: 1px solid rgb(73, 157, 242);
+  margin-bottom: 10px;
+}
+.details-content {
+  padding-left: 20px;
+  text-align: left;
+  size: 14px;
+  line-height: 30px;
+}
+.details-content:nth-child(even) {
+  background-color: rgb(245, 245, 245);
 }
 .icon-box {
   display: inline-block;
-  margin-left: 30px;
+  margin-left: 15px;
   .el-icon-warning {
     font-size: 50px;
     line-height: 30px;
@@ -1387,10 +1115,29 @@ export default class extends Vue {
   display: inline-block;
   line-height: 20px;
   font-size: 14px;
-  margin-left: 20px;
+  margin-left: 40px;
+  margin-top: -40px;
   .text-title {
     font-size: 24px;
   }
+  .end-text {
+    margin-left: 60px;
+  }
+}
+
+// .customerName {
+//   color: #108ee9;
+// }
+
+.el-table td,
+.el-table th {
+  text-align: center;
+}
+.el-dialog__body {
+  padding: 5px 20px 20px 20px;
+  color: #1f2d3d;
+  font-size: 14px;
+  word-break: break-all;
 }
 .el-dialog__footer {
   padding: 0px 20px 20px 20px;
