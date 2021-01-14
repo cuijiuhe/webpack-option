@@ -42,62 +42,13 @@ import variables from '@/styles/_variables.scss'
 })
 export default class extends Vue {
   public title = '项目名称'
+
   get sidebar() {
     return AppModule.sidebar
   }
 
   get routes() {
-    // 注释动态路由，实际开发中请打开
-    // return PermissionModule.addRouters
-
-    // 注释动态路由，实际开发中请打开
-    return [
-      {
-        'redirect': '/components/table',
-        'path': '/components',
-        'children': [
-          {
-            'path': 'table',
-            'meta': {
-              'keepAlive': true,
-              'noCache': false,
-              'icon': 'jewelry',
-              'fontSize': '20px',
-              'marginBottom': '-4px',
-              'title': '表格'
-            }
-          },
-          {
-            'path': 'form',
-            'meta': {
-              'keepAlive': true,
-              'noCache': false,
-              'icon': 'order',
-              'fontSize': '20px',
-              'marginBottom': '-4px',
-              'title': '表单'
-            }
-          },
-          {
-            'path': 'detail',
-            'meta': {
-              'keepAlive': true,
-              'noCache': false,
-              'icon': 'tradingvolume',
-              'fontSize': '20px',
-              'marginBottom': '-4px',
-              'title': '详情'
-            }
-          }
-        ],
-        'meta': {
-          'icon': 'nested',
-          'fontSize': '16px',
-          'marginBottom': '-4px',
-          'title': '功能页面'
-        }
-      }
-    ] 
+    return PermissionModule.addRouters
   }
 
   get variables() {

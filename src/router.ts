@@ -27,18 +27,8 @@ export const constantRouterMap: any[] = [
     }
   },
   {
-    path: '/',
-    redirect: '/components',
-    meta: { hidden: true }
-  },
-  {
     path: '/404',
     component: () => import(/* webpackChunkName: "404" */ '@/views/404.vue'),
-    meta: { hidden: true }
-  },
-  {
-    path: '*',
-    redirect: '/404',
     meta: { hidden: true }
   },
   {
@@ -47,9 +37,7 @@ export const constantRouterMap: any[] = [
     redirect: '/components/table',
     meta: {
       title: '功能页面',
-      icon: 'nested',
-      fontSize: '16px',
-      marginBottom: '-4px'
+      icon: 'nested'
     },
     children: [
       {
@@ -57,9 +45,7 @@ export const constantRouterMap: any[] = [
         component: () => import(/* webpackChunkName: "productpopularization" */ '@/views/components/table/index.vue'),
         meta: {
           title: '表格',
-          icon: 'jewelry',
-          fontSize: '20px',
-          marginBottom: '-4px'
+          icon: 'jewelry'
         }
       },
       {
@@ -67,9 +53,7 @@ export const constantRouterMap: any[] = [
         component: () => import(/* webpackChunkName: "allOrders" */ '@/views/components/form/index.vue'),
         meta: {
           title: '表单',
-          icon: 'order',
-          fontSize: '20px',
-          marginBottom: '-4px'
+          icon: 'order'
         }
       },
       {
@@ -77,9 +61,7 @@ export const constantRouterMap: any[] = [
         component: () => import(/* webpackChunkName: "dataAnalysis" */ '@/views/components/detail/index.vue'),
         meta: {
           title: '详情',
-          icon: 'tradingvolume',
-          fontSize: '20px',
-          marginBottom: '-4px'
+          icon: 'tradingvolume'
         }
       },
     ]
