@@ -6,6 +6,7 @@ import SvgIcon from 'vue-svgicon'
 
 import '@/styles/element-variables.scss'
 import '@/styles/index.scss'
+import '@/styles/index.css'
 
 import App from '@/App.vue'
 import store from '@/store'
@@ -14,12 +15,8 @@ import '@/icons/components'
 import '@/permission'
 import * as directives from '@/directives'
 import * as filters from './filters'
-import BaiduMap from 'vue-baidu-map'
-Vue.use(ElementUI)
 
-Vue.use(BaiduMap, {
-  ak: 'OEuipyHL9NbCim6LnYWcypC8kcOM9GPw'
-})
+Vue.use(ElementUI)
 Vue.use(SvgIcon, {
   tagName: 'svg-icon',
   defaultWidth: '1em',
