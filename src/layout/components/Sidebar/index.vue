@@ -1,5 +1,9 @@
 <template>
   <el-scrollbar wrap-class="scrollbar-wrapper">
+    <sidebar-logo
+      :collapse="isCollapse"
+      :title="title"
+    />
     <el-menu
       mode="vertical"
       :collapse="isCollapse"
@@ -26,18 +30,19 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 import { AppModule } from '@/store/modules/app'
 import { PermissionModule } from '@/store/modules/permission'
 import SidebarItem from './SidebarItem.vue'
+import SidebarLogo from './SidebarLogo.vue'
 import variables from '@/styles/_variables.scss'
 
 @Component({
   name: 'SideBar',
   components: {
-    SidebarItem
+    SidebarItem,
+    SidebarLogo
   }
 })
 export default class extends Vue {
-  mounted() {
-    console.log(PermissionModule)
-  }
+  public title = '项目名称'
+
   get sidebar() {
     return AppModule.sidebar
   }

@@ -25,12 +25,16 @@ router.beforeEach(async (to: Route, _: Route, next: any) => {
         try {
           // Get user info, including roles
           let { data } = await UserModule.GetUserInfo()
+          /* 注释获取动态路由，实际开发中请打开
           const path = data.menus
           const firstPath = path[0].redirect ? path[0].redirect : path[0].path // 获取动态路由的第一个 path
+          */
+          const path: any[] = [] // 组件展示，实际开发中注释
           await PermissionModule.GenerateRoutes({ path })
           router.addRoutes(PermissionModule.addRouters)
           if (to.path === '' || to.path === '/') {
-            next({ path: firstPath, replace: true })
+            // next({ path: firstPath, replace: true }) // 注释动态路由跳转，实际开发中请打开
+            next({ path: 'components', replace: true }) // 组件展示，实际开发中注释
           } else {
             next({ ...to, replace: true }) // hack方法 确保addRoutes已完成 ,set the replace: true so the navigation will not leave a history record
           }
@@ -41,7 +45,6 @@ router.beforeEach(async (to: Route, _: Route, next: any) => {
           Message.error(err || 'Has Error')
           next(`/login?redirect=${to.path}`)
           NProgress.done()
-          // location.href = `/portal/#/login?redirect=${location.href}`// 统一跳转到portal登录
           // location.href = `/portal/#/login` // 统一跳转到portal登录
         }
       } else {

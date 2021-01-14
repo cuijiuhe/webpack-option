@@ -11,6 +11,7 @@
             clearable
           ></el-input>
         </el-form-item>
+
         <el-form-item label="产品编码/ID">
           <el-input
             v-model="form.searchParam.productCode"
@@ -19,6 +20,7 @@
             clearable
           ></el-input>
         </el-form-item>
+
         <el-form-item label="推广状态">
           <el-select v-model="form.searchParam.productStatus " placeholder="请选择" clearable>
             <el-option
@@ -29,9 +31,18 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="getList()">查询</el-button>
+        <el-form-item label="产品类型">
+          <el-select v-model="form.searchParam.promoType " placeholder="请选择" clearable>
+            <el-option
+              v-for="item in getFilterProductTypeArr"
+              :key="item.businesstypeName"
+              :label="item.businesstypeName"
+              :value="item.typeIdentifier"
+            ></el-option>
+          </el-select>
         </el-form-item>
+
+        <el-button type="primary" style="margin-bottom: 20px;" size="small" @click="getList()">查询</el-button>
       </el-form>
     </div>
     <!-- 列表 -->
@@ -45,10 +56,21 @@
         stripe
         :header-cell-style="{background:'#eef1f6',color:'#606266'}"
         fit
+        max-height="540"
       >
         v-loading="listLoading"
         height="400px"
         >
+        <el-table-column
+          prop="promoType"
+          label="产品类型"
+          align="center"
+          :show-overflow-tooltip="true"
+        >
+          <template slot-scope="scope">
+            {{formatPromoType(scope.row.promoType)}}
+          </template>
+        </el-table-column>
         <el-table-column
           prop="productName"
           label="产品名称"
@@ -164,6 +186,20 @@
         ref="addForm"
         :rules="rules"
       >
+      <el-row>
+        <el-col :span='12'>
+          <el-form-item label="产品类型" :label-width="formLabelWidth">
+              <el-select v-model="addForm.promoType" @change="choseType" placeholder="请选择产品类型">
+                <el-option
+                  v-for="item in selectProductType"
+                  :key="item.businesstypeName"
+                  :label="item.businesstypeName"
+                  :value="item.typeIdentifier"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+        </el-col>
+      </el-row>
         <el-row>
           <el-col :span="12">
             <el-form-item label="产品编码" :label-width="formLabelWidth" prop="productCode">
@@ -171,7 +207,7 @@
                 <el-option
                   v-for="item in product_code"
                   :key="item.guid"
-                  :label="item.text"
+                  :label="item.key"
                   :value="item.key"
                 ></el-option>
               </el-select>
@@ -234,24 +270,12 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row>
-          <el-col :span="12" v-if="addForm.channel == 2">
-            <el-form-item
-              v-for="(item,index) in addForm.channelVoList"
-              :key="item.guid"
-              :label="item.channelName"
-              :label-width="formLabelWidth"
-              :prop="'channelVoList.'+index+ '.rewardMoney'"
-            >
-              <el-input
-                :placeholder="placeholderCotent"
-                type="number"
-                class="size-input"
-                v-model="item.rewardMoney"
-              ></el-input>
-            </el-form-item>
-          </el-col>
-          <div v-else>
+        <el-row v-if="addForm.channel == 1">
+          <el-form-item  v-for="(item, index) in filteredType" :key="index + item.channelName" :label="item.channelName" :label-width="formLabelWidth">
+            <el-input class="size-input" v-model="item.rewardMoney"></el-input>
+          </el-form-item>
+        </el-row>
+        <el-row v-else>
             <el-col :span="12" v-for="(item,index) in addForm.channelVoList" :key="item.guid">
               <el-form-item
                 :label="item.channelName"
@@ -266,8 +290,44 @@
                 ></el-input>
               </el-form-item>
             </el-col>
-          </div>
-          <el-col :span="12">
+          </el-row>
+        <el-row>
+          <!-- <el-col :span="12" v-if="addForm.channel == 2">
+            <el-form-item
+              v-for="(item,index) in addForm.channelVoList"
+              :key="item.guid"
+              :label="item.channelName"
+              :label-width="formLabelWidth"
+              :prop="'channelVoList.'+index+ '.rewardMoney'"
+            >
+              <el-input
+                :placeholder="placeholderCotent"
+                type="number"
+                class="size-input"
+                v-model="item.rewardMoney"
+              ></el-input>
+            </el-form-item>
+          </el-col> -->
+
+
+
+          <!-- <div v-else>
+            <el-col :span="12" v-for="(item,index) in addForm.channelVoList" :key="item.guid">
+              <el-form-item
+                :label="item.channelName"
+                :label-width="formLabelWidth"
+                :prop="'channelVoList.' +index+ '.rewardMoney'"
+              >
+                <el-input
+                  :placeholder="placeholderCotent"
+                  type="number"
+                  class="size-input"
+                  v-model="item.rewardMoney"
+                ></el-input>
+              </el-form-item>
+            </el-col>
+          </div> -->
+          <el-col :span="11">
             <el-form-item label="结算标准" :label-width="formLabelWidth" prop="settlementStandard">
               <el-select class="size-input" v-model="addForm.settlementStandard" placeholder="请选择">
                 <el-option
@@ -301,9 +361,8 @@
           </div>
         </el-col>
         <el-col class="details-content">产品名称： {{productDetail.productName}}</el-col>
-        <el-col
-          class="details-content"
-        >产品编码： {{productDetail.productCode | checkBaseData(product_code, product_code)}}</el-col>
+        <!-- <el-col class="details-content">产品编码： {{productDetail.productCode | checkBaseData(product_code, product_code)}}</el-col> -->
+        <el-col class="details-content">产品编码： {{productDetail.productNum}}</el-col>
         <el-col
           class="details-content"
         >激励方式： {{productDetail.excitationType | checkBaseData(excitation_type, excitation_type)}}</el-col>
@@ -392,6 +451,9 @@ import {
   addProduct,
   changeProductStatus,
   deleteProduct,
+  queryProductConfigurationType,
+  queryAccordingToProduct,
+  queryProductConfiguration
 } from "@/api/equitesProduct";
 
 import { getDictionaryList } from "@/api/common";
@@ -413,6 +475,7 @@ export default class extends Vue {
       productCode: "",
       productName: "",
       productStatus: "",
+      promoType: ""
     },
     size: 20,
   };
@@ -445,6 +508,7 @@ export default class extends Vue {
     channel: 1,
     settlementCycle: "",
     settlementStandard: "",
+    promoType: "",//产品类型
     channelVoList: this.channelVoList,
   };
   productDetail: object = {};
@@ -467,6 +531,11 @@ export default class extends Vue {
   product_code = [];
   private singleChannel = []; // 缓存单渠道
   private multiChannel = []; // 缓存多渠道
+  selectProductType:any = [];
+  chosedProductType:any = [];// 选完产品类型后过滤出的服务商
+
+  filteredType:any = []//匹配之后需要渲染的列表
+  getFilterProductTypeArr: any = []//产品类型筛选条件
   commission = (rule: any, value: any, callback: any) => {
     if (!value) {
       return callback(new Error("佣金不能为空"));
@@ -532,6 +601,8 @@ export default class extends Vue {
     this.fetchDictionaryList("product_code");
     this.fetchDictionaryList("channel_code");
     this.filterList();
+    this.getProductType();
+    this.getFilterProductType();
   }
   @Watch("addForm.channelVoList")
   getChannelVoList(newVal: any) {
@@ -539,6 +610,87 @@ export default class extends Vue {
       let a = "channelVoList." + `${index}` + ".rewardMoney";
       this.rules[a] = [{ validator: this.commission, trigger: "blur" }];
     });
+  }
+
+  choseType(val:any){
+    console.log(typeof(val))
+    // chosedProductType
+    let choseArr:any = [];
+    console.log(this.selectProductType)
+    this.selectProductType.forEach((item:any)=>{
+      if(val == item.typeIdentifier){
+        this.chosedProductType = item.authorizedChannel;
+        // this.addForm.settlementStandard = item.settlementTime;
+        let chosedObjs:any = []
+        this.settlement_standard.forEach((jtem:any)=>{
+          if(item.settlementTime == jtem.key){
+            chosedObjs.push(jtem)
+            this.settlement_standard = chosedObjs;
+            this.addForm.settlementStandard = jtem.key;
+          }
+        })
+      }
+    })
+    
+    let lastChoseArr:any = [];
+    this.channel_code.forEach((item:any)=>{
+      this.chosedProductType.forEach((jtem:any)=>{
+        if(item.text == jtem){
+          let obj:any = {
+            channelCode: `0${item.key}`,
+            channelId: null,
+            channelName: item.text,
+            productId: null,
+            rewardMoney: ''
+          }
+          lastChoseArr.push(obj);
+        }
+      })
+    })
+    this.filteredType = lastChoseArr;
+    this.addForm.channelVoList = lastChoseArr
+
+ //带出产品编码和产品名称
+
+    if(typeof(val)=='string'){
+      this.getTpyeNames(val); 
+    }
+  }
+  formatPromoType(promoTypes: any){
+    // let retArr:any = '';
+    // this.getFilterProductTypeArr.forEach((item:any)=>{
+    //   if(promoTypes == item.typeIdentifier){
+    //     retArr = item.businesstypeName;
+    //   }
+    // })
+    // return retArr;
+
+
+
+    let newRetArr = this.getFilterProductTypeArr.filter((item:any)=>{
+      return item.typeIdentifier == promoTypes;
+    })
+    return newRetArr[0].businesstypeName;
+  }
+  async getTpyeNames(vals: any){
+    const { data } = await queryAccordingToProduct({
+      typeIdentifier: vals
+    })
+    console.log(data.data)
+    let newTypeNames = data.data;
+    if(newTypeNames){
+      let codeNameArr:any = [];
+      newTypeNames.forEach((item:any)=>{
+        // if(vals == item.promoType){
+          codeNameArr.push(
+            {key: item.productCode, text: item.productName}
+          )
+          this.addForm.productCode = item.productCode;
+          this.addForm.productName = item.productName;
+        // }
+      })
+      this.product_code = codeNameArr;
+    }
   }
   // 获取字典项
   private async fetchDictionaryList(type: any) {
@@ -625,7 +777,16 @@ export default class extends Vue {
       this.placeholderCotent = "请输入实付金额单位:                          %";
     }
   }
-
+  //产品类型筛选条件下拉
+  async getFilterProductType(){
+    const { data } = await queryProductConfiguration({});
+    this.getFilterProductTypeArr = data.data;
+    console.log(this.getFilterProductTypeArr)
+    await this.unshiftAll();
+  }
+  unshiftAll(){
+    this.getFilterProductTypeArr.unshift({businesstypeName: "全部",typeIdentifier: "all"})
+  }
   // 打开推广产品添加dialog
   private addPromotionalProducts() {
     if (this.addNum === 0) {
@@ -639,13 +800,12 @@ export default class extends Vue {
       }, 0.2 * 1000);
     } else if (this.addNum == 2) {
       // 修改
-      console.log("修改");
       this.fetchDictionaryList("channel_code");
       setTimeout(() => {
         this.addForm.channelVoList = this.channelVoList;
       }, 0.2 * 1000);
     }
-
+  this.getProductType();
     // this.addForm.channel = 1;
     // if (this.addForm.channel === 1) {
     //   console.log(555);
@@ -668,7 +828,11 @@ export default class extends Vue {
       }
     });
   }
-
+  //调用产品类型接口
+  async getProductType(){
+    const { data } = await queryProductConfigurationType({});
+    this.selectProductType = data.data;
+  }
   // 提交 添加推广产品
   private async addPromoteProducts(formName: any) {
     let FormData: any = this.$refs[formName];
@@ -685,7 +849,6 @@ export default class extends Vue {
     });
   }
   private productCodeChange(val: any) {
-    console.log(val);
 
     let j: any;
     j = this.product_code.find((item: any) => {
@@ -746,9 +909,8 @@ export default class extends Vue {
       this.singleChannel = data.data.channelVoList;
     } else {
       this.multiChannel = data.data.channelVoList;
+      this.filteredType = data.data.channelVoList;
     }
-    console.log(this.singleChannel);
-    console.log(this.multiChannel);
   }
 
   // 打开推广详情dialog
@@ -775,7 +937,6 @@ export default class extends Vue {
   // 打开结束dialog
   private async endDialog(productId: string, status: string) {
     if (status === "1") {
-      console.log(this.endId, this.endStatus);
       // 启动
       const { data } = await changeProductStatus(productId, status);
       let message = data.message;
@@ -790,7 +951,6 @@ export default class extends Vue {
       this.endId = productId;
       this.endStatus = status;
       this.filterList();
-      console.log(this.endId, this.endStatus);
     }
   }
   // 结束 确定
@@ -822,10 +982,8 @@ export default class extends Vue {
     let message = data.message;
     let code = data.code;
     if (code === 0) {
-      console.log("1",message);
       this.$message.error(`产品${message}`);
     } else {
-      console.log("2",message);
       this.$message.success(`产品${message}`);
     }
 
