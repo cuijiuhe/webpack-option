@@ -1,61 +1,62 @@
 <template>
-  <div class="login">
-    <div class="content">
-      <div class="slogan"></div>
-      <div class="login-container">
+  <div class="login-container">
+    <transition-group class="login-bg" name="flip-list" tag="ul">
+      <li v-for="bg in loginBgs" :key="bg" class="list-item">
+        <img :src="bg">
+      </li>
+    </transition-group>
+    <div class="login-cover"/>
+    <div class="login-body">
+      <div class="login-content">
+        <h1 class="login-logo"/>
         <el-form
           ref="loginForm"
           :model="loginForm"
           :rules="loginRules"
+          auto-complete="on"
+          label-position="top"
           class="login-form"
-          autocomplete="on"
-          label-position="left"
         >
-          <div class="title-container">
-            <h3 class="title">{{title}}</h3>
-          </div>
-          <el-form-item prop="loginname">
-            <span class="svg-container">
-              <svg-icon name="user" />
-            </span>
+          <el-form-item label="用户名" prop="loginname">
             <el-input
-              class="login-input"
               ref="loginname"
               v-model="loginForm.loginname"
+              placeholder="请输入用户名"
               name="loginname"
               type="text"
-              autocomplete="on"
-              placeholder="用户名"
+              class="login-input"
             />
           </el-form-item>
-          <el-form-item prop="password">
-            <span class="svg-container">
-              <svg-icon name="password" />
-            </span>
+          <el-form-item label="密码" prop="password">
             <el-input
-              class="login-input"
-              :key="passwordType"
               ref="password"
-              v-model="loginForm.password"
               :type="passwordType"
-              placeholder="密码"
+              v-model="loginForm.password"
+              placeholder="请输入密码"
               name="password"
-              autocomplete="on"
-              @keyup.enter.native="handleLogin"
-            />
+              class="login-input"
+              @keyup.enter.native="handleLogin" />
             <span class="show-pwd" @click="showPwd">
               <svg-icon :name="passwordType === 'password' ? 'eye-off' : 'eye-on'" />
             </span>
           </el-form-item>
-
+          <el-form-item class="el-form-checkbox">
+            <el-checkbox
+              v-model="isChecked"
+              class="login-checkbox"
+            >记住用户名</el-checkbox>
+          </el-form-item>
           <el-button
-            class="login-button"
             :loading="loading"
             type="primary"
+            class="login-button"
             @click.native.prevent="handleLogin"
           >登录</el-button>
         </el-form>
       </div>
+    </div>
+    <div class="login-footer">
+      <p class="copyright">Copyright &copy; 北汽福田汽车股份有限公司 版权所有</p>
     </div>
   </div>
 </template>
@@ -68,18 +69,41 @@ import { Form as ElForm, Input } from "element-ui";
 import { UserModule } from "@/store/modules/user";
 import { isValidUsername } from "@/utils/validate";
 
+declare function require(string: any): string;
+
+const loginBg1 = require('@/assets/bg_01.png');
+// const loginBg2 = require('@/assets/bg_02.png');
+const loginBg3 = require('@/assets/bg_03.png');
+const loginBg4 = require('@/assets/bg_04.png');
+const loginBg5 = require('@/assets/bg_05.png');
+const loginBg6 = require('@/assets/bg_06.png');
+
 @Component({
   name: "Login",
 })
 export default class extends Vue {
-  private title = "用户登录";
+  private loginBgs:any[] = []
+  private loginBg:any[] = [
+    loginBg1,
+    // loginBg2,
+    loginBg3,
+    loginBg4,
+    loginBg5,
+    loginBg6
+  ]
+  private index:number = 0;
+  private isChecked = true;
+  private loginForm = {
+    loginname: "",
+    password: ""
+  };
   private validateUsername = (rule: any, value: string, callback: Function) => {
     if (value.length === 0) {
-      callback(new Error("请输入用户名"));
+      callback(new Error('请输入用户名'))
     } else {
-      callback();
+      callback()
     }
-  };
+  }
   private validatePassword = (rule: any, value: string, callback: Function) => {
     if (value.length === 0) {
       callback(new Error("请输入密码"));
@@ -87,15 +111,11 @@ export default class extends Vue {
       callback();
     }
   };
-  private loginForm = {
-    loginname: "",
-    password: "",
-  };
   private loginRules = {
-    loginname: [{ validator: this.validateUsername, trigger: "blur" }],
+    loginname: [{ validator: this.validateUsername, trigger: 'blur' }],
     password: [{ validator: this.validatePassword, trigger: "blur" }],
   };
-  private passwordType = "password";
+  private passwordType = 'password';
   private loading = false;
   private showDialog = false;
   private redirect?: string;
@@ -113,13 +133,17 @@ export default class extends Vue {
   }
 
   mounted() {
+    // 自动切换背景图片
+    this.loginBgs = [this.loginBg[0]]
+    this.startChange()
+
     if (this.loginForm.loginname === "") {
       (this.$refs.loginname as Input).focus();
     } else if (this.loginForm.password === "") {
       (this.$refs.password as Input).focus();
     }
   }
-
+  // 展示密码
   private showPwd() {
     if (this.passwordType === "password") {
       this.passwordType = "";
@@ -130,7 +154,7 @@ export default class extends Vue {
       (this.$refs.password as Input).focus();
     });
   }
-
+  // 登录处理
   private handleLogin() {
     (this.$refs.loginForm as ElForm).validate(async (valid: boolean) => {
       if (valid) {
@@ -154,7 +178,7 @@ export default class extends Vue {
       }
     });
   }
-
+  // 获取链接参数字符串
   private getOtherQuery(query: Dictionary<string>) {
     return Object.keys(query).reduce((acc, cur) => {
       if (cur !== "redirect") {
@@ -163,126 +187,194 @@ export default class extends Vue {
       return acc;
     }, {} as Dictionary<string>);
   }
+  // 自动切换背景图片
+  private startChange() {
+    setInterval(() => {
+      if (this.index < this.loginBg.length - 1) {
+        this.index++
+      } else {
+        this.index = 0
+      }
+      this.loginBgs.splice(0, 1, this.loginBg[this.index])
+    }, 10000)
+  }
 }
 </script>
 
 <style lang="scss">
-.login {
+  /* 修复input 背景不协调 和光标变色 */
+  /* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
+
+  $bg:#fff;
+  $light_gray:#333;
+  $cursor: #333;
+  $error: #ff3030;
+  @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
+    .login-input input{
+      color: $cursor;
+      &::first-line {
+        color: $light_gray;
+      }
+    }
+  } 
+  /* reset element-ui css */
+  .login-container {
+    .el-form-item {
+      margin-bottom: 22px;
+    }
+    .el-form-item__label {
+      display: block;
+      height: auto !important;
+      background-color: transparent;
+      border-right: 0;
+      color: $cursor;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 22px;
+      padding-bottom: 10px;
+    }
+    .el-form-item__error {
+      left: 16px;
+      color: $error;
+      font-size: 14px;
+      line-height: 22px;
+      padding-top: 2px;
+    }
+    .el-form-item.is-required:not(.is-no-asterisk) .el-form-item__label-wrap>.el-form-item__label:before, .el-form-item.is-required:not(.is-no-asterisk)>.el-form-item__label:before {
+      display: none;
+    }
+    .el-form-checkbox {
+      margin-top: -6px;
+      margin-bottom: 6px;
+    }
+    .login-input {
+      display: inline-block;
+      background-color: $bg;
+      input {
+        background: transparent;
+        border: 0px;
+        -webkit-appearance: none;
+        border-radius: 0px;
+        padding: 4px 16px;
+        color: $light_gray;
+        height: 40px;
+        caret-color: $cursor;
+        &:-webkit-autofill {
+          box-shadow: 0 0 0px 1000px $bg inset !important;
+          -webkit-text-fill-color: $cursor !important;
+        }
+      }
+    }
+    .login-button {
+      width: 100%;
+      height: 40px;
+      background: linear-gradient(-90deg, #740780 0%, #005ee1 0%, #008cef 100%);
+      border-radius: 0;
+      border: 0 none;
+      font-size: 14px;
+      line-height: 40px;
+      padding: 0 20px;
+    }
+    .el-checkbox,
+    .el-checkbox__input.is-checked + .el-checkbox__label {
+      color: #333;
+    }
+  }
+  @media (max-width: 1440px) and (min-width: 1280px) {
+    .el-form .el-form-item .el-form-item__label,
+    .el-form .el-form-item .el-input {
+      width: 100% !important;
+    }
+  }
+</style>
+<style lang="scss" scoped>
+$dark_gray:#889aa4;
+.login-container {
   position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  height: 100%;
   width: 100%;
-  min-width: 1000px;
-  background: url("../../assets/login-img/bg_login.png") no-repeat left center;
-  background-size: cover;
-  .content {
+  min-width: 600px;
+  min-height: 680px;
+  overflow: hidden;
+  .show-pwd {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    font-size: 16px;
+    color: $dark_gray;
+    cursor: pointer;
+    user-select: none;
+    margin-top: -20px;
+  }
+  .flip-list-enter-active, .flip-list-leave-active {
+    transition: all 3s;
+  }
+  .flip-list-enter, .flip-list-leave-active {
+      opacity: 0;
+  }
+  .login-bg li {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .login-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .login-cover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 9;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.001);
+  }
+  .login-body {
     position: relative;
-    width: 1000px;
+    z-index: 100;
+    width: 100%;
     height: 100%;
     margin: 0 auto;
   }
-  .slogan {
+  .login-content {
     position: absolute;
     top: 50%;
-    left: 40px;
-    width: 440px;
-    height: 170px;
-    background: url("../../assets/login-img/bg_login_title.png") no-repeat 0 0;
-    background-size: 440px auto;
-    transform: translate3d(0, -72px, 0);
-  }
-  .tips {
-    font-size: 14px;
-    color: #fff;
-    margin-bottom: 10px;
-
-    span {
-      &:first-of-type {
-        margin-right: 16px;
-      }
-    }
-  }
-  .svg-container {
-    position: absolute;
-    top: 50%;
-    left: 10px;
-    z-index: 10;
-    color: #ccc;
-    font-size: 16px;
-    line-height: 28px;
-    transform: translateY(-50%);
-    user-select: none;
-  }
-  .title-container {
-    position: relative;
-    .title {
-      color: #fff;
-      font-size: 24px;
-      line-height: 32px;
-      margin: 16px auto 36px;
-      text-align: center;
-      font-weight: bold;
-    }
-  }
-  .show-pwd {
-    position: absolute;
-    top: 50%;
-    right: 10px;
-    z-index: 10;
-    color: $darkGray;
-    font-size: 16px;
-    line-height: 28px;
-    transform: translateY(-50%);
-    cursor: pointer;
-    user-select: none;
-  }
-  .login-form {
-    position: absolute;
-    top: 50%;
-    right: 40px;
+    right: 16%;
+    z-index: 101;
     box-sizing: border-box;
-    width: 360px;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
+    width: 366px;
+    height: 392px;
+    background-color: rgba(255, 255, 255, 0.6);
+    border-radius: 6px;
     padding: 40px;
-    transform: translateY(-50%);
+    margin-top: -220px;
   }
-  .login-title {
-    color: #fff;
-    font-size: 24px;
-    font-weight: 700;
-    line-height: 32px;
-    text-align: center;
-    padding: 16px 0 36px;
+  .login-logo {
+    display: block;
+    width: 104px;
+    height: 36px;
+    background: url("../../assets/logo_foton.png") no-repeat 0 0;
+    background-size: cover;
+    margin: 0 0 20px 0;
   }
-  .el-form-item {
-    position: relative;
-    margin-bottom: 20px;
-  }
-  .login-input .el-input__inner {
-    background: transparent;
-    border-color: rgba(255, 255, 255, 0.5);
-    color: #fff;
-    font-size: 14px;
-    padding-left: 36px;
-    &:focus {
-      border-color: rgba(255, 255, 255, 1);
+  .login-footer {
+    position: fixed;
+    bottom: 20px;
+    right: 0;
+    left: 0;
+    padding: 8px 0;
+    .copyright {
+      color: #fff;
+      font-size: 14px;
+      line-height: 22px;
+      text-align: center;
+      margin: 0;
+      padding: 0 16px;
     }
-  }
-  .login-checkbox {
-    display: block;
-    color: #fff;
-    margin-bottom: 20px;
-  }
-  .login-button {
-    display: block;
-    width: 100%;
-    font-size: 16px;
-    padding-top: 11px;
-    padding-bottom: 11px;
-    margin-bottom: 20px;
   }
 }
 </style>
