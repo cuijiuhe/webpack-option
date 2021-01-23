@@ -36,13 +36,11 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { AppModule } from '@/store/modules/app'
 import { UserModule } from '@/store/modules/user'
-import Breadcrumb from '@/components/Breadcrumb/index.vue'
 import Hamburger from '@/components/Hamburger/index.vue'
 
 @Component({
 	name: 'Navbar',
 	components: {
-		Breadcrumb,
 		Hamburger
 	}
 })
@@ -90,7 +88,7 @@ export default class extends Vue {
 	align-items: center;
 	justify-content: space-between;
 	padding-left: 20px;
-	
+
 	.logo-box{
 		display: flex;
 		align-items: center;
@@ -103,6 +101,7 @@ export default class extends Vue {
 	}
 
 	.hamburger-container {
+    display: none;
 		line-height: 60px;
 		height: 100%;
 		// float: left;
@@ -115,10 +114,6 @@ export default class extends Vue {
 		&:hover {
 			background: rgba(0, 0, 0, 0.025);
 		}
-	}
-
-	.breadcrumb-container {
-		float: left;
 	}
 
 	.right-menu {

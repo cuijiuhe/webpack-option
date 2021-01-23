@@ -5,8 +5,8 @@
   >
     <svg-icon
       name="hamburger"
-      width="20"
-      height="20"
+      width="22"
+      height="22"
     />
   </div>
 </template>
@@ -28,7 +28,10 @@ export default class extends Vue {
 
 <style lang="scss" scoped>
 .svg-icon {
-  vertical-align: middle;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .is-active {

@@ -1,6 +1,5 @@
 /* Variables */
-/* Element Variables */
-
+// common
 $colorPrimary: #409EFF;
 $colorSuccess: #67C23A;
 $colorWarning: #E6A23C;
@@ -35,24 +34,50 @@ $gapMini: 8px;
 $gapLarge: 24px;
 $gapLarger: 48px;
 
-// Sidebar
+// navBar
+$navBarHeight: 60px;
+
+// breadcrumb
+$breadcrumbHeight: 48px;
+
+// breadcrumb
+$breadcrumbHeight: 48px;
+
+
+// sideBar
 $sideBarWidth: 240px;
-$sideBarWidthFold: 64px;
+$sideBarBg: $colorWhite;
+$sideBarBorderColor: $borderColorSecondary;
+$sideBarWidthFold: 65px;
+$sideBarLogoHeight: 48px;
 $menuHeight: 48px;
 $menuPaddingLeft: 40px;
-$menuPaddingLeftFold: 24px;
-$menuPaddingRight: 24px;
-$menuBg:#fff;
-$menuText:#606266;
-$menuHover:#e6f6ff;
-$menuActiveText:#409EFF; // Also see settings.sidebarTextTheme
+$menuPaddingLeftFold: $gapLarge;
+$menuPaddingRight: $gapLarge;
+$menuBg: $colorWhite;
+$menuText: $textColorNormal;
+$menuHoverBg:rgba(64, 158, 255, .1);;
+$menuActiveText: $colorPrimary; // Also see settings.sidebarTextTheme
+$menuActiveBg:rgba(64, 158, 255, .1);
+$menuIconSize: $fontSizeLarge;
+$menuIconGap: $gapMini;
 $subMenuPaddingLeft: 64px;
 $subMenuPaddingLeftFold: 40px;
-$subMenuPaddingRight: 40px;
+$subMenuPaddingRight: $gapLarge;
 $subMenuBg:#fff;
 $subMenuHover:#e6f6ff;
-$subMenuActiveText:#409EFF;
+$subMenuActiveText:$colorPrimary;
 $subMenuActiveBg:rgba(64, 158, 255, .1);
+$subMenuIconSize: $fontSizeLarge;
+$subMenuIconBg: #d8d8d8;
+$subMenuIconActiveBg: $colorPrimary;
+$subMenuIconGap: $gapMini;
+
+// dialog
+$dialogWidthNormal: 640px;
+$dialogWidthSmall: 440px;
+$dialogWidthLarge: 840px;
+
 
 // The :export directive is the magic sauce for webpack
 // https://mattferderer.com/use-sass-variables-in-typescript-and-javascript

@@ -84,19 +84,19 @@ export default class extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.el-breadcrumb__inner,
-.el-breadcrumb__inner a {
-  font-weight: 400 !important;
-}
-
 .app-breadcrumb.el-breadcrumb {
   display: inline-block;
-  font-size: 14px;
-  line-height: 54px;
-  margin-left: 8px;
+  font-size: $fontSizeNormal;
+  line-height: 48px;
+  margin-left: $gapNormal;
+
+  .el-breadcrumb__inner,
+  .el-breadcrumb__inner a {
+    font-weight: 400 !important;
+  }
 
   .no-redirect {
-    color: #97a8be;
+    color: $textColorSecondary;
     cursor: text;
   }
 }

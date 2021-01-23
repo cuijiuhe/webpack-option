@@ -7,15 +7,13 @@
     <el-menu
       mode="vertical"
       :collapse="isCollapse"
-      :background-color="variables.menuBg"
-      :text-color="variables.menuText"
-      :active-text-color="variables.menuActiveText"
       :unique-opened="true"
       :collapse-transition="true"
       :default-openeds="['1']"
     >
       <sidebar-item
-        v-for="route in routes"
+        v-for="(route, index) in routes"
+        :index="index"
         :key="route.path"
         :item="route"
         :base-path="route.path"
@@ -63,39 +61,41 @@ export default class extends Vue {
 
 <style lang="scss">
 .sidebar-container {
+  background-color: $sideBarBg;
+  border-right: 1px solid $sideBarBorderColor;
   // reset element-ui css
   .horizontal-collapse-transition {
     transition: 0s width ease-in-out, 0s padding-left ease-in-out, 0s padding-right ease-in-out;
   }
-
-  .scrollbar-wrapper {
-    overflow-x: hidden !important;
-  }
-
-  .el-scrollbar__view {
+  .el-scrollbar {
     height: 100%
   }
-
+  .scrollbar-wrapper {
+    overflow-x: hidden !important;
+    overflow-y: auto;
+  }
+  .el-scrollbar__view {
+    display: flex;
+    flex-direction: column;
+    height: 100%
+  }
   .el-scrollbar__bar {
     &.is-vertical {
-      right: 0px;
+      right: 0;
     }
-
     &.is-horizontal {
       display: none;
     }
   }
-}
-</style>
-
-<style lang="scss" scoped>
-.el-scrollbar {
-  height: 100%
-}
-
-.el-menu {
-  border: none;
-  height: 100%;
-  width: 100% !important;
+  .sidebar-logo-container {
+    flex: none;
+    margin-bottom: $gapLarge;
+  }
+  .el-menu {
+    flex: auto;
+    height: 100%;
+    width: 100% !important;
+    border: none;
+  }
 }
 </style>

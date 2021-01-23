@@ -10,18 +10,20 @@
           :class="{'submenu-title-noDropdown': isFirstLevel}"
         >
           <svg-icon
-            :style="{fontSize:theOnlyOneChild.meta.fontSize || '20px', marginBottom:theOnlyOneChild.meta.marginBottom || '0px'}"
             v-if="theOnlyOneChild.meta.icon"
             :name="theOnlyOneChild.meta.icon"
           />
-          <span v-if="theOnlyOneChild.meta.title" slot="title">{{ theOnlyOneChild.meta.title }}</span>
+          <span class="menu-title" v-if="theOnlyOneChild.meta.title" slot="title">{{ theOnlyOneChild.meta.title }}</span>
         </el-menu-item>
       </sidebar-item-link>
     </template>
     <el-submenu v-else :index="resolvePath(item.path)" popper-append-to-body>
       <template slot="title">
-        <svg-icon :style="{fontSize:item.meta.fontSize || '20px', marginBottom:item.meta.marginBottom || '0px'}" v-if="item.meta && item.meta.icon" :name="item.meta.icon" />
-        <span v-if="item.meta && item.meta.title" slot="title">{{ item.meta.title }}</span>
+        <svg-icon
+          v-if="item.meta && item.meta.icon"
+          :name="item.meta.icon"
+        />
+        <span class="menu-title" v-if="item.meta && item.meta.title" slot="title">{{ item.meta.title }}</span>
       </template>
       <template v-if="item.children">
         <sidebar-item
@@ -102,60 +104,126 @@ export default class extends Vue {
 </script>
 
 <style lang="scss">
-.el-submenu.is-active > .el-submenu__title {
-  color: $subMenuActiveText !important;
+.el-submenu {
+  &__title {
+    height: $menuHeight;
+    line-height: $menuHeight;
+    padding: 0 $menuPaddingRight 0 $menuPaddingLeft !important;
+    color: $menuText;
+    font-size: $fontSizeNormal;
+  }
+  &__icon-arrow {
+    right: $menuPaddingRight !important;
+    color: $menuText !important;
+    font-size: $fontSizeNormal !important;
+  }
+  .svg-icon {
+    width: $menuIconSize !important;
+    height: $menuIconSize !important;
+    margin-right: $menuIconGap !important;
+  }
+  &.is-active {
+    .svg-icon {
+      margin-right: 0 !important;
+    }
+  }
+  .el-menu-item {
+    height: $menuHeight;
+    line-height: $menuHeight;
+    padding: 0 $subMenuPaddingRight 0 $subMenuPaddingLeft !important;
+    .svg-icon {
+      display: none;
+    }
+    .menu-title {
+      display: flex;
+      align-items: center;
+      &::before {
+        content: "";
+        flex: none;
+        width: 4px;
+        height: 4px;
+        background-color: $subMenuIconBg;
+        margin-right: $subMenuIconGap;
+      }
+    }
+    &.is-active {
+      background-color: $subMenuActiveBg !important;
+      border-right: 4px solid $subMenuIconActiveBg !important;
+      .menu-title {
+        &::before {
+          background-color: $subMenuIconActiveBg !important;
+        }
+      }
+    }
+  }
+  &.is-active {
+    .el-submenu__title {
+      color: $menuActiveText !important;
+    }
+  }
 }
 
 .full-mode {
   .nest-menu .el-submenu > .el-submenu__title,
   .el-submenu .el-menu-item {
-    min-width: $sideBarWidth !important;
-    background-color: $subMenuBg !important;
-
     &:hover {
       background-color: $subMenuHover !important;
     }
   }
 }
-
 .simple-mode {
   &.first-level {
     .submenu-title-noDropdown {
       padding: 0 !important;
       position: relative;
-
       .el-tooltip {
         padding: 0 !important;
       }
     }
-
     .el-submenu {
       overflow: hidden;
-
       & > .el-submenu__title {
-        padding: 0px !important;
-
+        padding: 0 $menuPaddingRight 0 $menuPaddingLeftFold !important;
+        .svg-icon {
+          margin-right: 0 !important;
+        }
         .el-submenu__icon-arrow {
           display: none;
         }
-
         & > span {
           visibility: hidden;
         }
       }
     }
   }
-}
-</style>
-
-<style lang="scss" scoped>
-.svg-icon {
-  margin-right: 16px;
-}
-
-.simple-mode {
-  .svg-icon {
-    margin-left: 20px;
+  .el-menu-item {
+    height: $menuHeight !important;
+    line-height: $menuHeight !important;
+    padding: 0 $gapLarge !important;
+    transition: border-color .3s,background-color .3s,color .3s;
+    .svg-icon {
+      display: none;
+    }
+    .menu-title {
+      display: flex;
+      align-items: center;
+      &::before {
+        content: "";
+        flex: none;
+        width: 4px;
+        height: 4px;
+        background-color: $subMenuIconBg;
+        margin-right: $subMenuIconGap;
+      }
+    }
+    &.is-active {
+      background-color: $subMenuActiveBg !important;
+      .menu-title {
+        &::before {
+          background-color: $subMenuIconActiveBg !important;
+        }
+      }
+    }
   }
 }
 </style>

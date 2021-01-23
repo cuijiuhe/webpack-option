@@ -1,11 +1,3 @@
-<!--
- * @Author: your name
- * @Date: 2021-01-07 14:56:09
- * @LastEditTime: 2021-01-13 14:12:31
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: /web-project-template/src/layout/components/Sidebar/SidebarLogo.vue
--->
 <template>
   <div
     class="sidebar-logo-container"
@@ -15,15 +7,10 @@
       <router-link
         key="expand"
         class="sidebar-logo-link"
-        to="/"
+        to=""
       >
-        <img
-          src="@/assets/icon_app.png"
-          class="sidebar-logo"
-        >
-        <h1 class="sidebar-title">
-          {{ title }}
-        </h1>
+        <img src="@/assets/icon_app.png" class="sidebar-logo" />
+        <h1 class="sidebar-title">{{ title }}</h1>
       </router-link>
     </transition>
   </div>
@@ -43,49 +30,45 @@ export default class extends Vue {
 
 <style lang="scss" scoped>
 .sidebarLogoFade-enter-active {
-  transition: opacity 1.5s;
+  transition: opacity 0.28s;
 }
-
 .sidebarLogoFade-enter,
 .sidebarLogoFade-leave-to {
   opacity: 0;
 }
-
 .sidebar-logo-container {
   position: relative;
-  width: 100%;
-  height: 54px;
-  line-height: 54px;
-  background: #F4F6FA;
-  text-align: center;
+  height: $sideBarLogoHeight;
+  background-color: $backgroundColorSecondary;
   overflow: hidden;
-
-  & .sidebar-logo-link {
+  .sidebar-logo-link {
+    display: flex;
+    justify-items: flex-start;
+    align-items: center;
     height: 100%;
-    width: 100%;
-
-    & .sidebar-logo {
-      width: 20px;
-      height: 20px;
-      vertical-align: middle;
-      margin-right: 12px;
+    padding-left: $menuPaddingLeft;
+    .sidebar-logo {
+      flex: none;
+      width: 16px;
+      height: 16px;
     }
-
-    & .sidebar-title {
-      display: inline-block;
-      margin: 0;
-      color: #606266;
-      font-weight: 600;
-      line-height: 54px;
-      font-size: 14px;
-      font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
-      vertical-align: middle;
+    .sidebar-title {
+      flex: auto;
+      color: $textColorNormal;
+      font-size: $fontSizeLarge;
+      font-weight: $fontWeightBold;
+      white-space: nowrap;
+      margin: 0 0 0 $gapMini;
+      transition: opacity 0.28s;
     }
   }
-
   &.collapse {
-    .sidebar-logo {
-      margin-right: 0px;
+    .sidebar-logo-link {
+      padding-left: $menuPaddingLeftFold;
+    }
+    .sidebar-title {
+      opacity: 0;
+      width: 0;
     }
   }
 }
