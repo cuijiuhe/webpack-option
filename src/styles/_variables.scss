@@ -1,29 +1,58 @@
 /* Variables */
+/* Element Variables */
 
-// Base color
-$blue:#324157;
-$light-blue:#3A71A8;
-$red:#C03639;
-$pink: #E65D6E;
-$green: #30B08F;
-$tiffany: #4AB7BD;
-$yellow:#FEC171;
-$panGreen: #30B08F;
+$colorPrimary: #409EFF;
+$colorSuccess: #67C23A;
+$colorWarning: #E6A23C;
+$colorDanger: #F56C6C;
+$colorInfo: #909399;
+$colorWhite: #FFFFFF;
+$colorBlack: #000000;
+
+$backgroundColorPrimary: #F1F1F1;
+$backgroundColorSecondary: #FAFAFA;
+
+$textColorNormal: #3E4044;
+$textColorSecondary: #606266;
+$textColorTertiary: #909399;
+$textColorPlaceholder: #D8D8D8;
+
+$borderColorNormal: #DDDDDD;
+$borderColorSecondary: #EEEEEE;
+$borderColorTertiary: #F1F1F1;
+
+$fontSizeNormal: 14px;
+$fontSizeSmall: 12px;
+$fontSizeLarge: 16px;
+$fontSizeLarger: 18px;
+
+$fontWeightNormal: 400;
+$fontWeightBold: 700;
+
+$gapNormal: 20px;
+$gapSmall: 12px;
+$gapMini: 8px;
+$gapLarge: 24px;
+$gapLarger: 48px;
 
 // Sidebar
-$sideBarWidth: 230px;
-$subMenuBg:#fff;
-$subMenuHover:#e6f6ff;
-$subMenuActiveText:#409eff;
+$sideBarWidth: 240px;
+$sideBarWidthFold: 64px;
+$menuHeight: 48px;
+$menuPaddingLeft: 40px;
+$menuPaddingLeftFold: 24px;
+$menuPaddingRight: 24px;
 $menuBg:#fff;
 $menuText:#606266;
-$menuActiveText:#409eff; // Also see settings.sidebarTextTheme
-
-// Login page
-$lightGray: #eee;
-$darkGray:#889aa4;
-$loginBg: #2d3a4b;
-$loginCursorColor: #fff;
+$menuHover:#e6f6ff;
+$menuActiveText:#409EFF; // Also see settings.sidebarTextTheme
+$subMenuPaddingLeft: 64px;
+$subMenuPaddingLeftFold: 40px;
+$subMenuPaddingRight: 40px;
+$subMenuBg:#fff;
+$subMenuHover:#e6f6ff;
+$subMenuActiveText:#409EFF;
+$subMenuActiveBg:rgba(64, 158, 255, .1);
 
 // The :export directive is the magic sauce for webpack
 // https://mattferderer.com/use-sass-variables-in-typescript-and-javascript

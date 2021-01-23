@@ -5,7 +5,7 @@ import ElementUI from 'element-ui'
 import SvgIcon from 'vue-svgicon'
 
 import '@/styles/element-variables.scss'
-import '@/styles/index.scss'
+import '@/styles/common.scss'
 import '@/styles/index.css'
 
 import App from '@/App.vue'
