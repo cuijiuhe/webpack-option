@@ -122,11 +122,6 @@ export default class extends Vue {
     height: $menuIconSize !important;
     margin-right: $menuIconGap !important;
   }
-  &.is-active {
-    .svg-icon {
-      margin-right: 0 !important;
-    }
-  }
   .el-menu-item {
     height: $menuHeight;
     line-height: $menuHeight;
