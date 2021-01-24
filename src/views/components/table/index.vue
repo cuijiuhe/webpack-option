@@ -1036,9 +1036,6 @@ export default class extends Vue {
 
 <style lang="scss">
 .order {
-  &-container {
-    margin: 20px;
-  }
 
   &-header {
     padding: 20px;
