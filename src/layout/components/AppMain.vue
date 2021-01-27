@@ -20,6 +20,10 @@ export default class extends Vue {}
 
 <style lang="scss" scoped>
 .app-main {
+  display: flex;
+  flex-direction: column;
+  // position: absolute;
+  min-height: 100%;
   padding: 0 $gapNormal $gapNormal;
   overflow: hidden;
 }

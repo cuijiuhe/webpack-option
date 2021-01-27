@@ -62,9 +62,8 @@ export default class extends mixins(ResizeMixin) {
 	@include clearfix;
 	position: relative;
 	height: 100%;
-	width: 100%;
   background-color: $backgroundColorPrimary;
-	overflow-y: auto;
+	overflow: auto;
 }
 .drawer-bg {
 	position: fixed;
