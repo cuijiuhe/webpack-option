@@ -81,7 +81,7 @@
         <h2 class="table-title">列表数据</h2>
         <div class="table-tools">
           <el-button type="default" size="small" @click="toggleSelection()">取消选择</el-button>
-          <el-button type="primary" size="small">选中列表</el-button>
+          <el-button type="primary" size="small" @click="toggleSelection([tableList[0], tableList[2]])">选中列表</el-button>
         </div>
       </div>
       <div class="talbe-body">
@@ -112,22 +112,18 @@
           <el-table-column
             prop="name"
             label="姓名"
-            width="120"
           ></el-table-column>
           <el-table-column
             prop="province"
             label="省份"
-            width="120"
           ></el-table-column>
           <el-table-column
             prop="city"
             label="市区"
-            width="120"
           ></el-table-column>
           <el-table-column
             prop="address"
             label="地址"
-            width="160"
             show-overflow-tooltip
           ></el-table-column>
           <el-table-column
