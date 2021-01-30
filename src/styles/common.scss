@@ -226,21 +226,24 @@ a:hover {
 
 /* Element-ui */
 .el-card {
-  box-shadow: none !important;
   border: 0 none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: $gapNormal;
 
   .el-card__header {
-    padding: $gapNormal;
+    padding: 0;
     border-bottom: none;
   }
 
   .el-card__body {
-    padding: 0 $gapNormal $gapNormal;
+    padding: 0;
   }
 }
 
 .el-form {
 
+  .el-form-item,
   .el-form-item--mini.el-form-item,
   .el-form-item--small.el-form-item {
     margin-bottom: $gapLarge;
@@ -249,6 +252,44 @@ a:hover {
 
 .el-button+.el-button {
   margin-left: $gapSmall !important;
+}
+
+.el-input__inner {
+  padding: 0 $gapSmall !important;
+}
+
+.el-input--prefix .el-input__inner {
+  padding-left: 38px !important;
+}
+
+.el-input__prefix {
+  left: 8px !important;
+}
+
+.el-input__suffix {
+  right: 8px !important;
+}
+
+.el-input__suffix .el-input__inner {
+  padding-right: 38px !important;
+}
+
+.el-input__icon {
+  width: 22px !important;
+}
+
+.el-date-editor.el-input,
+.el-date-editor.el-input__inner,
+.el-date-editor--daterange.el-input,
+.el-date-editor--daterange.el-input__inner,
+.el-date-editor--timerange.el-input,
+.el-date-editor--timerange.el-input__inner {
+  width: 50% !important;
+  min-width: 240px !important;
+}
+
+.el-select {
+  width: 100%;
 }
 
 .el-table {
@@ -281,6 +322,7 @@ a:hover {
 
 .filter-container {
   flex: none;
+  padding: $gapNormal 0;
 
   .filter-form {
     height: 112px;
@@ -308,10 +350,6 @@ a:hover {
     i {
       margin-left: 4px;
     }
-  }
-
-  .el-card__body {
-    padding: $gapNormal 0;
   }
 
   .el-form {
@@ -356,6 +394,7 @@ a:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: $gapNormal;
   }
 
   .table-title {
@@ -371,5 +410,53 @@ a:hover {
     justify-content: flex-end;
     align-items: center;
     margin: $gapNormal -10px 0 0;
+  }
+}
+
+.form-container {
+  flex: auto;
+
+  .form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $gapNormal;
+  }
+
+  .form-title {
+    font-size: $fontSizeLarge;
+    font-weight: $fontWeightNormal;
+    line-height: 24px;
+    margin: 0;
+    padding: 0;
+  }
+
+  .form-body {
+    width: 720px;
+    margin: 0 auto;
+  }
+
+  .form-footer,
+  .form-button-group {
+    text-align: center;
+    margin-top: $gapLarger;
+    padding-bottom: $gapNormal;
+  }
+
+  .el-form-item {
+    display: flex;
+  }
+
+  .el-form-item__label {
+    flex: none;
+    width: 120px;
+    padding-right: $gapNormal;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .el-form-item__content {
+    flex: auto;
   }
 }
