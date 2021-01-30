@@ -2,13 +2,12 @@
   <!-- 功能页面  -->
   <div class="page-container">
     <!-- 筛选  -->
-    <el-card class="filter-container" shadow="never">
+    <div class="filter-container">
       <div class="filter-form" :class="{'filter-form-extend': filterExtend}">
         <el-form
-          ref="filterForms"
+          ref="filterForm"
           :model="filterForm"
           label-position="right"
-          label-width="100"
           size="small"
         >
           <el-form-item label="产品名称">
@@ -74,12 +73,13 @@
         <el-button type="default" size="small" @click="handleFilterReset()">重置</el-button>
         <el-button type="primary" size="small" @click="handleFilterList()">查询</el-button>
       </div>
-    </el-card>
+    </div>
     <!-- 列表  -->
-    <el-card class="table-container" shadow="never">
-      <div class="table-header" slot="header">
+    <div class="table-container">
+      <div class="table-header">
         <h2 class="table-title">列表数据</h2>
         <div class="table-tools">
+          <el-button type="primary" size="small" @click="handleShowDialog()">添加列表</el-button>
           <el-button type="default" size="small" @click="toggleSelection()">取消选择</el-button>
           <el-button type="primary" size="small" @click="toggleSelection([tableList[0], tableList[2]])">选中列表</el-button>
         </div>
@@ -151,7 +151,7 @@
           </el-table-column>
         </el-table>
       </div>
-      <div class="table-pagination">
+      <div class="table-footer">
         <el-pagination
           :total="total"
           :page-size="filterForm.pageSize"
@@ -162,15 +162,84 @@
           @size-change="selsChange"
         />
       </div>
-    </el-card>
+    </div>
+    <!-- 弹层  -->
+    <el-dialog
+      class="dialog-container"
+      title="弹层标题"
+      :visible.sync="dialogForms"
+      @close="handleCloseDialog"
+    >
+      <div class="form-container">
+        <div class="form-header">
+          <h2 class="form-title">表单标题</h2>
+        </div>
+        <div class="form-body">
+          <el-form
+            ref="dialogForm"
+            size="small"
+            :model="dialogForm"
+            :rules="dialogFormRules"
+          >
+            <el-form-item label="活动名称" prop="name">
+              <el-input v-model="dialogForm.name" placeholder="请输入活动名称"></el-input>
+            </el-form-item>
+            <el-form-item label="活动区域" prop="region">
+              <el-select v-model="dialogForm.region" placeholder="请选择活动区域">
+                <el-option label="区域一" value="shanghai"></el-option>
+                <el-option label="区域二" value="beijing"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="活动时间" required>
+              <el-date-picker
+                type="daterange"
+                range-separator="-"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                v-model="dialogForm.date1"
+              ></el-date-picker>
+            </el-form-item>
+            <el-form-item label="创建时间" required>
+              <el-date-picker
+                type="date"
+                placeholder="选择创建时间"
+                v-model="dialogForm.date2"
+              ></el-date-picker>
+            </el-form-item>
+            <el-form-item label="即时配送" prop="delivery">
+              <el-switch v-model="dialogForm.delivery"></el-switch>
+            </el-form-item>
+            <el-form-item label="活动性质" prop="type">
+              <el-checkbox-group v-model="dialogForm.type">
+                <el-checkbox label="美食/餐厅线上活动" name="type"></el-checkbox>
+                <el-checkbox label="地推活动" name="type" checked></el-checkbox>
+                <el-checkbox label="线下主题活动" name="type"></el-checkbox>
+                <el-checkbox label="单纯品牌曝光" name="type"></el-checkbox>
+              </el-checkbox-group>
+            </el-form-item>
+            <el-form-item label="特殊资源申请" prop="resource">
+              <el-radio-group v-model="dialogForm.resource">
+                <el-radio label="线上品牌商赞助"></el-radio>
+                <el-radio label="线下场地免费"></el-radio>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item label="活动形式" prop="desc">
+              <el-input type="textarea" v-model="dialogForm.desc"></el-input>
+            </el-form-item>
+          </el-form>
+        </div>
+      </div>
+      <div class="dialog-footer" slot="footer">
+        <el-button size="small" @click="handleCloseDialog()">取消</el-button>
+        <el-button type="primary" size="small" :loading="loading" @click.native.prevent="handleSubmitForm()">提交</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from "vue-property-decorator";
+import { Component, Vue } from "vue-property-decorator";
 import { Form as ElForm } from "element-ui";
-import { UserModule } from "@/store/modules/user";
-import { getDictionaryList } from "@/api/common";
 
 declare module "vue/types/vue" {
   interface Vue {
@@ -204,7 +273,7 @@ export default class extends Vue {
   // 是否展开筛选项按钮内容：展开/收起
   private filterExtendText = '展开';
   // 筛选项表单验证规则
-  private filterRules: any = {
+  private filterformRules: any = {
     productName: [
       { required: true, message: "请输入产品名称", trigger: "blur" },
       { min: 2, max: 50, message: "请输入2-50个汉字", trigger: "blur" },
@@ -259,7 +328,6 @@ export default class extends Vue {
     zip: 200333
   }]
   private multipleTable: any;
-  private filterForms: any;
   private tableList: any[] = [];
   private multipleSelection: any[] = [];
   private tableLoading = false;
@@ -274,10 +342,47 @@ export default class extends Vue {
     label: '已过期',
     value: '03'
   }]
+  private dialogForms = false;
+  private dialogForm = {
+    name: '',
+    region: '',
+    date1: '',
+    date2: '',
+    delivery: false,
+    type: [],
+    resource: '',
+    desc: ''
+  }
+
+  private dialogFormRules = {
+    name: [
+      { required: true, message: '请输入活动名称', trigger: 'blur' },
+      { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+    ],
+    region: [
+      { required: true, message: '请选择活动区域', trigger: 'change' }
+    ],
+    date1: [
+      { type: 'daterange', required: true, message: '请选择日期', trigger: ['change', 'blur'] }
+    ],
+    date2: [
+      { type: 'date', required: true, message: '请选择创建时间', trigger: ['change', 'blur'] }
+    ],
+    type: [
+      { type: 'array', required: true, message: '请至少选择一个活动性质', trigger: 'change' }
+    ],
+    resource: [
+      { required: true, message: '请选择活动资源', trigger: 'change' }
+    ],
+    desc: [
+      { required: true, message: '请填写活动形式', trigger: 'blur' }
+    ]
+  }
+
+  private loading = false;
 
   mounted() {
     this.multipleTable = this.$refs.multipleTable;
-    this.filterForms = this.$refs.filterForms;
     this.filterLength = Object.keys(this.filterForm.searchParam).length
     // console.log(this.filterLength);
     this.handleFilterList();
@@ -297,19 +402,22 @@ export default class extends Vue {
       this.tableLoading = false;
     }, 1 * 1000);
   }
+
   // 筛选项展示隐藏
   private handleFilterExtend() {
     this.filterExtend = !this.filterExtend
     this.filterExtendText = this.filterExtend ? '收起' : '展开'
   }
+
   // 筛选列表数据
   private handleFilterList() {
     this.filterForm.pageIndex = 1;
     this.getTableList();
   }
+
   // 筛选项重置
   private handleFilterReset() {
-    this.filterForms.resetFields();
+    (this.$refs.filterForm as ElForm).resetFields();
     this.filterForm.searchParam = {
       productCode: '',
       productName: '',
@@ -323,11 +431,13 @@ export default class extends Vue {
     this.filterForm.pageIndex = 1;
     this.getTableList();
   }
+
   // 选择展示条数
   private selsChange(val: any) {
     this.filterForm.pageSize = val;
     this.getTableList();
   }
+
   // 选择表格项操作
   toggleSelection(rows: any[]) {
     if (rows) {
@@ -338,10 +448,36 @@ export default class extends Vue {
       this.multipleTable.clearSelection();
     }
   }
+
   // 选择表格项操作
   handleSelectionChange(val: any) {
     this.multipleSelection = val;
     console.log(this.multipleSelection);
+  }
+
+  // 显示弹层
+  handleShowDialog() {
+    this.dialogForms = true;
+  }
+
+  // 关闭弹层
+  handleCloseDialog() {
+    this.dialogForms = false;
+  }
+
+  // 提交表单项
+  private handleSubmitForm() {
+    (this.$refs.dialogForm as ElForm).validate(async (valid: boolean) => {
+      if (valid) {
+        this.loading = true;
+        this.$message('submit!')
+        setTimeout(() => {
+          this.loading = false;
+        }, 0.5 * 1000);
+      } else {
+        return false;
+      }
+    })
   }
 }
 </script>

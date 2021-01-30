@@ -1,8 +1,8 @@
 <template>
   <!-- 功能页面  -->
   <div class="page-container">
-
-    <el-card class="form-container" shadow="never">
+    <!-- 表单  -->
+    <div class="form-container">
       <div class="form-header">
         <h2 class="form-title">表单标题</h2>
       </div>
@@ -63,7 +63,7 @@
         <el-button @click="handleResetForm()">重置</el-button>
         <el-button type="primary" :loading="loading" @click.native.prevent="handleSubmitForm()">提交</el-button>
       </div>
-    </el-card>
+    </div>
   </div>
 </template>
 
