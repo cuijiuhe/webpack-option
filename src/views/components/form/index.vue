@@ -1,12 +1,12 @@
 <template>
   <!-- 功能页面  -->
-  <div class="page-container">
+  <div class="mod-page">
     <!-- 表单  -->
-    <div class="form-container">
-      <div class="form-header">
-        <h2 class="form-title">表单标题</h2>
+    <el-card class="mod-card mod-form">
+      <div class="mod-card-header">
+        <h2 class="mod-card-title">表单标题</h2>
       </div>
-      <div class="form-body">
+      <div class="mod-card-body">
         <el-form
           ref="ruleForm"
           :model="ruleForm"
@@ -59,11 +59,11 @@
           </el-form-item>
         </el-form>
       </div>
-      <div class="form-footer">
+      <div class="mod-card-footer">
         <el-button @click="handleResetForm()">重置</el-button>
         <el-button type="primary" :loading="loading" @click.native.prevent="handleSubmitForm()">提交</el-button>
       </div>
-    </div>
+    </el-card>
   </div>
 </template>
 

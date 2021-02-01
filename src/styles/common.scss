@@ -307,7 +307,11 @@ a:hover {
   }
 
   th {
-    padding: 15px 0 !important;
+    height: 54px;
+  }
+
+  td {
+    height: 48px;
   }
 
   .el-button+.el-button,
@@ -335,39 +339,67 @@ a:hover {
 }
 
 /* Module */
-.page-container {
+.page-container,
+.mod-page {
   display: flex;
   flex-direction: column;
   min-height: calc(100vh - 128px);
 }
 
-.filter-container {
-  flex: none;
+.mod-card {
   background-color: $colorWhite;
+
+  &+& {
+    margin-top: $gapNormal;
+  }
+
+  &-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $gapNormal;
+  }
+
+  &-title {
+    font-size: $fontSizeLarge;
+    font-weight: $fontWeightNormal;
+    line-height: 24px;
+    margin: 0;
+    padding: 0;
+  }
+
+  &-tool {
+    font-size: $fontSizeNormal;
+    font-weight: $fontWeightNormal;
+    line-height: 22px;
+  }
+}
+
+.mod-filter {
+  flex: none;
   padding: $gapNormal 0;
 
-  .filter-form {
+  .mod-card-body {
     height: 112px;
     overflow: hidden;
   }
 
-  .filter-form-extend {
+  .mod-card-body-extend {
     height: auto;
   }
 
-  .filter-tools {
+  .mod-card-footer {
     display: flex;
     justify-content: flex-end;
     align-items: center;
     padding: 0 $gapNormal;
   }
 
-  .filter-extend {
+  .el-button--text,
+  .el-button--text:hover,
+  .el-button--text:active,
+  .el-button--text:focus {
     color: $textColorSecondary;
-    font-size: $fontSizeNormal;
-    line-height: 22px;
-    margin-right: $gapSmall;
-    cursor: pointer;
 
     i {
       margin-left: 4px;
@@ -408,27 +440,10 @@ a:hover {
   }
 }
 
-.table-container {
+.mod-table {
   flex: auto;
-  background-color: $colorWhite;
-  padding: $gapNormal;
 
-  .table-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: $gapNormal;
-  }
-
-  .table-title {
-    font-size: $fontSizeLarge;
-    font-weight: $fontWeightNormal;
-    line-height: 24px;
-    margin: 0;
-    padding: 0;
-  }
-
-  .table-footer {
+  .mod-card-footer {
     display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -436,37 +451,15 @@ a:hover {
   }
 }
 
-.filter-container + .table-container {
-  margin-top: $gapNormal;
-}
-
-.form-container {
+.mod-form {
   flex: auto;
-  background-color: $colorWhite;
-  padding: $gapNormal;
 
-  .form-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: $gapNormal;
-  }
-
-  .form-title {
-    font-size: $fontSizeLarge;
-    font-weight: $fontWeightNormal;
-    line-height: 24px;
-    margin: 0;
-    padding: 0;
-  }
-
-  .form-body {
+  .mod-card-body {
     width: 720px;
     margin: 0 auto;
   }
 
-  .form-footer,
-  .form-button-group {
+  .mod-card-footer {
     text-align: center;
     margin-top: $gapLarger;
     padding-bottom: $gapNormal;
@@ -490,33 +483,75 @@ a:hover {
   }
 }
 
-.dialog-container {
+.mod-detail {
+  flex: none;
+
+  &:last-child {
+    flex: auto;
+  }
+
+  .mod-list {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: -$gapNormal;
+
+    &-item {
+      display: flex;
+      width: 33.33%;
+      font-size: $fontSizeNormal;
+      line-height: 22px;
+      padding-right: $gapSmall;
+      margin-bottom: $gapNormal;
+    }
+
+    &-label {
+      flex: none;
+      color: $textColorSecondary;
+      margin-right: $gapSmall;
+    }
+
+    &-value {
+      flex: auto;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+  }
+}
+
+.mod-dialog {
   .el-dialog {
     width: 640px;
   }
 
-  &.dialog-small {
+  &.mod-dialog-small {
     .el-dialog {
       width: 440px;
     }
   }
 
-  &.dialog-large {
+  &.mod-dialog-large {
     .el-dialog {
       width: 940px;
     }
   }
 
-  .form-container {
+  .mod-card {
     padding: 0;
+  }
 
-    .form-header {
-      justify-content: center;
-    }
+  .mod-card-header {
+    justify-content: center;
+  }
 
-    .form-body {
+  .mod-form {
+    .mod-card-body {
       width: auto;
-      padding: 0 50px;
+      padding: 0 65px;
     }
+  }
+
+  .mod-list-item {
+    width: 100%;
   }
 }

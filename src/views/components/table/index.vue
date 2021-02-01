@@ -1,9 +1,9 @@
 <template>
   <!-- 功能页面  -->
-  <div class="page-container">
+  <div class="mod-page">
     <!-- 筛选  -->
-    <div class="filter-container">
-      <div class="filter-form" :class="{'filter-form-extend': filterExtend}">
+    <el-card class="mod-card mod-filter">
+      <div class="mod-card-body" :class="{'mod-card-body-extend': filterExtend}">
         <el-form
           ref="filterForm"
           :model="filterForm"
@@ -68,23 +68,23 @@
           </el-form-item>
         </el-form>
       </div>
-      <div v-if="filterLength >= 3" class="filter-tools">
-        <div v-if="filterLength > 6" class="filter-extend" @click="handleFilterExtend()">{{ filterExtendText }}<i :class="[filterExtend ? 'el-icon-arrow-up' : 'el-icon-arrow-down']"></i></div>
+      <div v-if="filterLength >= 3" class="mod-card-footer">
+        <el-button v-if="filterLength > 6" type="text" size="small" @click="handleFilterExtend()">{{ filterExtendText }}<i :class="[filterExtend ? 'el-icon-arrow-up' : 'el-icon-arrow-down']"></i></el-button>
         <el-button type="default" size="small" @click="handleFilterReset()">重置</el-button>
         <el-button type="primary" size="small" @click="handleFilterList()">查询</el-button>
       </div>
-    </div>
+    </el-card>
     <!-- 列表  -->
-    <div class="table-container">
-      <div class="table-header">
-        <h2 class="table-title">列表数据</h2>
-        <div class="table-tools">
-          <el-button type="primary" size="small" @click="handleShowDialog()">添加列表</el-button>
+    <el-card class="mod-card mod-table">
+      <div class="mod-card-header" slot="header">
+        <h2 class="mod-card-title">列表数据</h2>
+        <div class="mod-card-tool">
+          <el-button type="primary" size="small" @click="handleShowDialogForm()">添加列表</el-button>
           <el-button type="default" size="small" @click="toggleSelection()">取消选择</el-button>
           <el-button type="primary" size="small" @click="toggleSelection([tableList[0], tableList[2]])">选中列表</el-button>
         </div>
       </div>
-      <div class="talbe-body">
+      <div class="mod-card-body">
         <el-table
           :data="tableList"
           ref="multipleTable"
@@ -136,8 +136,8 @@
             label="操作"
             width="150"
           >
-            <template slot-scope="scope">
-              <el-button type="text" size="small" @click="handleClick(scope.row)">查看</el-button>
+            <template>
+              <el-button type="text" size="small" @click="handleShowDialogDetail()">查看</el-button>
               <el-dropdown trigger="click">
                 <el-button type="text" size="small">
                   更多<i class="el-icon-arrow-down el-icon--right"></i>
@@ -151,7 +151,7 @@
           </el-table-column>
         </el-table>
       </div>
-      <div class="table-footer">
+      <div class="mod-card-footer">
         <el-pagination
           :total="total"
           :page-size="filterForm.pageSize"
@@ -162,19 +162,19 @@
           @size-change="selsChange"
         />
       </div>
-    </div>
+    </el-card>
     <!-- 弹层  -->
     <el-dialog
-      class="dialog-container"
+      class="mod-dialog"
       title="弹层标题"
       :visible.sync="dialogForms"
-      @close="handleCloseDialog"
+      @close="handleCloseDialogForm"
     >
-      <div class="form-container">
-        <div class="form-header">
-          <h2 class="form-title">表单标题</h2>
+      <el-card class="mod-card mod-form">
+        <div class="mod-card-header" slot="header">
+          <h2 class="mod-card-title">表单标题</h2>
         </div>
-        <div class="form-body">
+        <div class="mod-card-body">
           <el-form
             ref="dialogForm"
             size="small"
@@ -228,10 +228,140 @@
             </el-form-item>
           </el-form>
         </div>
-      </div>
+      </el-card>
       <div class="dialog-footer" slot="footer">
-        <el-button size="small" @click="handleCloseDialog()">取消</el-button>
+        <el-button size="small" @click="handleCloseDialogForm()">取消</el-button>
         <el-button type="primary" size="small" :loading="loading" @click.native.prevent="handleSubmitForm()">提交</el-button>
+      </div>
+    </el-dialog>
+    <!-- 弹层  -->
+    <el-dialog
+      class="mod-dialog"
+      title="弹层标题"
+      :visible.sync="dialogDetails"
+      @close="handleCloseDialogDetail"
+    >
+      <el-card class="mod-card mod-detail">
+        <div class="mod-card-header" slot="header">
+          <h2 class="mod-card-title">基本信息</h2>
+        </div>
+        <div class="mod-card-body">
+          <ul class="mod-list">
+            <li class="mod-list-item">
+              <span class="mod-list-label">订单编号</span>
+              <el-tooltip
+                effect="dark"
+                :content="detailData.orderCode"
+                placement="top"
+              >
+                <span class="mod-list-value">{{ detailData.orderCode }}</span>
+              </el-tooltip>
+            </li>
+            <li class="mod-list-item">
+              <span class="mod-list-label">订单类型</span>
+              <span class="mod-list-value">
+                {{ detailData.orderType }}
+              </span>
+            </li>
+            <li class="mod-list-item">
+              <span class="mod-list-label">来源渠道</span>
+              <span class="mod-list-value">
+                {{ detailData.orderChannel }}
+              </span>
+            </li>
+            <li class="mod-list-item">
+              <span class="mod-list-label">会员手机号</span>
+              <span class="mod-list-value">
+                {{ detailData.memberPhone }}
+              </span>
+            </li>
+            <li class="mod-list-item">
+              <span class="mod-list-label">会员ID</span>
+              <span class="mod-list-value">
+                {{ detailData.payMember }}
+              </span>
+            </li>
+            <li class="mod-list-item">
+              <span class="mod-list-label">订单创建时间</span>
+              <span class="mod-list-value">
+                {{ detailData.payTime }}
+              </span>
+            </li>
+            <li class="mod-list-item">
+              <span class="mod-list-label">订单完成时间</span>
+              <span class="mod-list-value">
+                {{ detailData.completeTime }}
+              </span>
+            </li>
+          </ul>
+        </div>
+      </el-card>
+      <el-card class="mod-card mod-table">
+        <div class="mod-card-header" slot="header">
+          <h2 class="mod-card-title">商品信息</h2>
+        </div>
+        <div class="mod-card-body">
+          <el-table
+            :data="detailTable"
+            ref="detailTable"
+            v-loading="tableLoading"
+            tooltip-effect="dark"
+            border
+            stripe
+          >
+            <el-table-column
+              fixed
+              label="序号"
+              type="index"
+              width="77"
+            ></el-table-column>
+            <el-table-column
+              prop="productId"
+              label="产品ID"
+              width="140"
+              show-overflow-tooltip
+            ></el-table-column>
+            <el-table-column
+              prop="productName"
+              label="产品名称"
+              width="160"
+              show-overflow-tooltip
+            ></el-table-column>
+            <el-table-column
+              prop="productImg"
+              label="产品图片"
+              width="105"
+            >
+              <template scope="scope">
+                <el-image
+                  :src="scope.row.productImg"
+                  fit="cover"
+                  :preview-src-list="imgList"
+                  style="display:block;width:48px;height:48px;margin: 0 auto;"
+                ></el-image>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="salesPrice"
+              label="产品单价"
+              width="105"
+            ></el-table-column>
+            <el-table-column
+              prop="totalQuantity"
+              label="产品数量"
+              width="105"
+              show-overflow-tooltip
+            ></el-table-column>
+            <el-table-column
+              prop="totalPrice"
+              label="产品应付金额"
+              width="133"
+            ></el-table-column>
+          </el-table>
+        </div>
+      </el-card>
+      <div class="dialog-footer" slot="footer">
+        <el-button type="primary" size="small" @click="handleCloseDialogDetail()">关闭</el-button>
       </div>
     </el-dialog>
   </div>
@@ -378,6 +508,65 @@ export default class extends Vue {
       { required: true, message: '请填写活动形式', trigger: 'blur' }
     ]
   }
+  private detailData = {
+    productName: '车联网服务(重卡版)', // 产品名称
+    marketPrice: '399', // 产品价格
+    orderCode: '167078920210131011393933030307881f53c7', // 订单编号
+    payMember: '1670789', // 会员号
+    phone: '13811821894', // 手机号
+    orderStatus: '已完成', // 订单状态
+    price: '399', // 商品价格
+    totalPrice: '399', // 订单总金额
+    transportPrice: '0', // 运费金额
+    discountPrice: '0', // 优惠金额
+    paymentAmount: '399', // 实付金额
+    isApplyInvoice: '是', // 是否开具发票
+    payType: '在线支付', // 支付类型
+    payCode: 'PAY167078920210131011030789fea93e', // 支付流水号
+    payAmount: '399', // 实付金额
+    disTotalPrice: '0', // 优惠总金额
+    disPrice:'0', // 优惠券优惠
+    redEnvelopePrice: '0', // 红包抵扣金额
+    deductFromPoint: '0', // 积分金额
+    disNum: '0', // 优惠券使用张数
+    pointsNum: '0', // 抵扣积分
+    pointsPrice: '0', // 积分抵扣金额
+    titleType: '个人', // 发票抬头
+    title: '个人', // 个人或公司名称
+    invoiceMobile: '张二狗', // 个人或公司名称
+    payTime: '2021-01-31 01:10:45', // 订单支付时间
+    completeTime: '2021-01-31 01:10:45', // 订单完成时间
+    payChannel: '微信', // 支付方式
+    enterpriseType: '电子普通发票', // 发票类型
+    taxPayerIdentification: '', // 识别纳税人
+    invoiceContent: '', // 发票内容
+    invoiceStatus: '', // 发票状态
+    invoiceStatusName: '开票中', // 开票状态
+    reasonType: '', // 售后类型
+    cancelStatus: '', //  售后状态
+    customCancelReason: '', // 售后描述
+    enterpriseInvoiceMail: '', // 发票邮箱
+    productNum: '1', // 产品数量
+    createTime: '2021-01-31 01:10:31', // 下单日期
+    orderType: '普通订单', // 订单类型
+    payStatus: '已支付', // 支付状态
+    cancelCode: '', // 退款单编号
+    orderChannel: '福田e家', // 来源渠道
+    memberPhone: '13811821894', //会员手机号
+  };
+  private detailTable: any[] = [{
+    productId: '1-ZNRRMHD', // 产品id
+    productName: '车联网服务(重卡版)', // 产品名称
+    totalQuantity: '399', // 产品单价
+    产品数量: '1', // 手机号
+    orderStatus: '已完成', // 订单状态
+    salesPrice: '399', // 产品单价
+    totalPrice: '399', // 产品应付金额
+    productImg: 'https://obs-fix-video.obs.cn-north-1.myhwclouds.com/e8324d8b13a44d6f94bbf6b28c2edc13.png', // 产品图片
+  }]
+  private imgList = ['https://obs-fix-video.obs.cn-north-1.myhwclouds.com/e8324d8b13a44d6f94bbf6b28c2edc13.png']
+
+  private dialogDetails = false;
 
   private loading = false;
 
@@ -455,14 +644,24 @@ export default class extends Vue {
     console.log(this.multipleSelection);
   }
 
-  // 显示弹层
-  handleShowDialog() {
+  // 显示表单弹层
+  handleShowDialogForm() {
     this.dialogForms = true;
   }
 
-  // 关闭弹层
-  handleCloseDialog() {
+  // 关闭表单弹层
+  handleCloseDialogForm() {
     this.dialogForms = false;
+  }
+
+  // 显示表单弹层
+  handleShowDialogDetail() {
+    this.dialogDetails = true;
+  }
+
+  // 关闭弹层
+  handleCloseDialogDetail() {
+    this.dialogDetails = false;
   }
 
   // 提交表单项
