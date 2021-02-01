@@ -118,6 +118,7 @@ export default class extends mixins(ResizeMixin) {
 	width: $sideBarWidth !important;
   height: $breadcrumbHeight;
   background-color: $backgroundColorSecondary;
+  border-right: 1px solid $sideBarBorderColor;
   line-height: $breadcrumbHeight;
   text-align: center;
   color: $textColorNormal;
@@ -153,6 +154,7 @@ export default class extends mixins(ResizeMixin) {
 		width: $sideBarWidthFold !important;
     height: $navBarHeight;
     background-color: transparent;
+    border-right: 0;
     color: #fff;
   }
 	.breadcrumb-container {

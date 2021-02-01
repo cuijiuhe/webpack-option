@@ -35,6 +35,8 @@ export default class extends Vue {
 }
 
 .is-active {
-  transform: rotate(180deg);
+  .svg-icon {
+    transform: translate(-50%, -50%)rotate(180deg);
+  }
 }
 </style>

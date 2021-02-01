@@ -55,7 +55,7 @@ body,
 }
 
 body {
-  min-width: 1280px;
+  min-width: 1200px;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
 }
@@ -285,7 +285,6 @@ a:hover {
 .el-date-editor--timerange.el-input,
 .el-date-editor--timerange.el-input__inner {
   width: 100% !important;
-  min-width: 240px !important;
 }
 
 .el-select {
@@ -413,7 +412,6 @@ a:hover {
   flex: auto;
   background-color: $colorWhite;
   padding: $gapNormal;
-  margin-top: $gapNormal;
 
   .table-header {
     display: flex;
@@ -436,6 +434,10 @@ a:hover {
     align-items: center;
     margin: $gapNormal -10px 0 0;
   }
+}
+
+.filter-container + .table-container {
+  margin-top: $gapNormal;
 }
 
 .form-container {
