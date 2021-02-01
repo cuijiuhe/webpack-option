@@ -1,8 +1,8 @@
 const path = require('path')
-const name = '项目名称'
+const name = 'Web平台UI组件库'
 
 module.exports = {
-  publicPath: process.env.NODE_ENV === 'production' ? '/projectName/' : '/', // TODO: Remember to change this to fit your need
+  publicPath: process.env.NODE_ENV === 'production' ? '/webUI/' : '/', // TODO: Remember to change this to fit your need
   // lintOnSave: process.env.NODE_ENV === 'development',
   lintOnSave: false,
   pwa: {

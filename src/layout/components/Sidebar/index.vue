@@ -39,7 +39,7 @@ import variables from '@/styles/_variables.scss'
   }
 })
 export default class extends Vue {
-  public title = '项目名称'
+  public title = '组件库'
 
   get sidebar() {
     return AppModule.sidebar
