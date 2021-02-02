@@ -291,6 +291,10 @@ a:hover {
   width: 100%;
 }
 
+.el-dropdown-menu__item {
+  white-space: nowrap;
+}
+
 .el-table {
 
   td,
@@ -335,6 +339,32 @@ a:hover {
 
   .el-dialog__footer {
     padding: $gapNormal;
+  }
+}
+
+.el-message-box {
+  width: 440px !important;
+  padding: $gapNormal !important;
+  .el-message-box__header {
+    padding: 0 !important;
+  }
+  .el-message-box__title {
+    font-size: $fontSizeLarger;
+    font-weight: $fontWeightNormal;
+    line-height: 24px;
+  }
+  .el-message-box__headerbtn {
+    top: 0;
+    right: 0;
+  }
+  .el-message-box__content {
+    font-size: $fontSizeNormal;
+    line-height: 22px;
+    padding: $gapNormal 0 0;
+  }
+  .el-message-box__btns {
+    padding: $gapNormal 0 0;
+    text-align: right;
   }
 }
 

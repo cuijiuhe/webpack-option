@@ -136,15 +136,15 @@
             label="操作"
             width="150"
           >
-            <template scope="scope">
+            <template slot-scope="scope">
               <el-button type="text" size="small" @click="handleShowDialogDetail(scope.row)">查看</el-button>
               <el-dropdown trigger="click">
                 <el-button type="text" size="small">
                   更多<i class="el-icon-arrow-down el-icon--right"></i>
                 </el-button>
-                <el-dropdown-menu slot="dropdown" size="mini">
+                <el-dropdown-menu slot="dropdown" size="small">
                   <el-dropdown-item size="small">编辑</el-dropdown-item>
-                  <el-dropdown-item size="small">删除</el-dropdown-item>
+                  <el-dropdown-item size="small" @click.native="handleDeleteItem">删除</el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
             </template>
@@ -332,7 +332,7 @@
               label="产品图片"
               width="105"
             >
-              <template scope="scope">
+              <template slot-scope="scope">
                 <el-image
                   :src="scope.row.productImg"
                   fit="cover"
@@ -637,7 +637,26 @@ export default class extends Vue {
   // 选择表格项操作
   handleSelectionChange(val: any) {
     this.multipleSelection = val;
-    console.log(this.multipleSelection);
+    // console.log(this.multipleSelection);
+  }
+
+  // 删除表格选项
+  handleDeleteItem() {
+    this.$confirm('此操作将永久删除该选项, 是否继续?', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(() => {
+      this.$message({
+        type: 'success',
+        message: '删除成功!'
+      });
+    }).catch(() => {
+      this.$message({
+        type: 'info',
+        message: '已取消删除'
+      });
+    });
   }
 
   // 显示表单弹层
