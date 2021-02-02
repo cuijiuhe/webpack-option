@@ -28,8 +28,19 @@ export const constantRouterMap: any[] = [
   },
   {
     path: '/404',
-    component: () => import(/* webpackChunkName: "404" */ '@/views/404.vue'),
-    meta: { hidden: true }
+    redirect: '/components/404',
+    meta: {
+      title: '404',
+      hidden: true
+    }
+  },
+  {
+    path: '/',
+    redirect: '/components/table',
+    meta: {
+      title: '首页',
+      hidden: true
+    }
   },
   {
     path: '/components',
@@ -42,7 +53,7 @@ export const constantRouterMap: any[] = [
     children: [
       {
         path: 'table',
-        component: () => import(/* webpackChunkName: "productpopularization" */ '@/views/components/table/index.vue'),
+        component: () => import(/* webpackChunkName: "table" */ '@/views/components/table/index.vue'),
         meta: {
           title: '表格',
           icon: 'jewelry'
@@ -50,7 +61,7 @@ export const constantRouterMap: any[] = [
       },
       {
         path: 'form',
-        component: () => import(/* webpackChunkName: "allOrders" */ '@/views/components/form/index.vue'),
+        component: () => import(/* webpackChunkName: "form" */ '@/views/components/form/index.vue'),
         meta: {
           title: '表单',
           icon: 'order'
@@ -58,13 +69,30 @@ export const constantRouterMap: any[] = [
       },
       {
         path: 'detail',
-        component: () => import(/* webpackChunkName: "dataAnalysis" */ '@/views/components/detail/index.vue'),
+        component: () => import(/* webpackChunkName: "detail" */ '@/views/components/detail/index.vue'),
         meta: {
           title: '详情',
           icon: 'tradingvolume'
         }
       },
+      {
+        path: '404',
+        component: () => import(/* webpackChunkName: "404" */ '@/views/404.vue'),
+        meta: {
+          title: '404',
+          icon: 'tradingvolume',
+          hidden: true
+        }
+      }
     ]
+  },
+  {
+    path: '*',
+    redirect: '/404',
+    meta: {
+      title: '404',
+      hidden: true
+    }
   }
 ]
 
