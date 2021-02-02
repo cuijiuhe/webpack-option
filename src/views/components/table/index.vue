@@ -136,8 +136,8 @@
             label="操作"
             width="150"
           >
-            <template>
-              <el-button type="text" size="small" @click="handleShowDialogDetail()">查看</el-button>
+            <template scope="scope">
+              <el-button type="text" size="small" @click="handleShowDialogDetail(scope.row)">查看</el-button>
               <el-dropdown trigger="click">
                 <el-button type="text" size="small">
                   更多<i class="el-icon-arrow-down el-icon--right"></i>
@@ -336,7 +336,6 @@
                 <el-image
                   :src="scope.row.productImg"
                   fit="cover"
-                  :preview-src-list="imgList"
                   style="display:block;width:48px;height:48px;margin: 0 auto;"
                 ></el-image>
               </template>
@@ -564,10 +563,7 @@ export default class extends Vue {
     totalPrice: '399', // 产品应付金额
     productImg: 'https://obs-fix-video.obs.cn-north-1.myhwclouds.com/e8324d8b13a44d6f94bbf6b28c2edc13.png', // 产品图片
   }]
-  private imgList = ['https://obs-fix-video.obs.cn-north-1.myhwclouds.com/e8324d8b13a44d6f94bbf6b28c2edc13.png']
-
   private dialogDetails = false;
-
   private loading = false;
 
   mounted() {
