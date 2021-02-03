@@ -143,7 +143,7 @@
                   更多<i class="el-icon-arrow-down el-icon--right"></i>
                 </el-button>
                 <el-dropdown-menu slot="dropdown" size="small">
-                  <el-dropdown-item size="small">编辑</el-dropdown-item>
+                  <el-dropdown-item size="small" @click.native="handleEditItem">编辑</el-dropdown-item>
                   <el-dropdown-item size="small" @click.native="handleDeleteItem">删除</el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
@@ -638,6 +638,11 @@ export default class extends Vue {
   handleSelectionChange(val: any) {
     this.multipleSelection = val;
     // console.log(this.multipleSelection);
+  }
+
+  // 编辑表格选项
+  handleEditItem() {
+    this.$router.push('/components/form')
   }
 
   // 删除表格选项
