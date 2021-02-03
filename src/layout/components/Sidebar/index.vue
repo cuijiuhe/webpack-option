@@ -71,8 +71,16 @@ export default class extends Vue {
     height: 100%
   }
   .scrollbar-wrapper {
+    margin-right: 0 !important;
+    margin-bottom: 0 !important;
     overflow-x: hidden !important;
     overflow-y: auto;
+    &::-webkit-scrollbar {
+      display: none;
+      width: 0 !important;
+      height: 0 !important;
+      overflow: hidden;
+    }
   }
   .el-scrollbar__view {
     display: flex;
