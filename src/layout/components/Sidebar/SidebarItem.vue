@@ -65,7 +65,7 @@ export default class extends Vue {
     if (this.item.children) {
       const showingChildren = this.item.children.filter((item) => {
         if (item.meta && item.meta.hidden) {
-          return false;
+          return true;
         } else {
           return true;
         }
