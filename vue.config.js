@@ -1,8 +1,8 @@
 const path = require('path')
-const name = '项目名称'
+const name = 'Web平台UI组件库' // 项目名称
 
 module.exports = {
-  publicPath: process.env.NODE_ENV === 'production' ? '/projectName/' : '/', // TODO: Remember to change this to fit your need
+  publicPath: process.env.NODE_ENV === 'production' ? '/webUI/' : '/', // TODO: Remember to change this to fit your need
   // lintOnSave: process.env.NODE_ENV === 'development',
   lintOnSave: false,
   pwa: {
@@ -10,10 +10,10 @@ module.exports = {
   },
   devServer: {
     proxy: {
-      '^/projectApi': {
-        // target: 'http://10.20.19.230:8188',
-        target: 'https://sdicm.foton.com.cn/sharecenter',
-        pathRewrite: { '^/projectApi': '' },
+      // projectApi 为项目接口代理路径，用于本地开发，开发时改为相应项目对应的名称，比如：shareApi
+      '^/shareApi': {
+        target: 'http://10.100.2.159:8188',
+        pathRewrite: { '^/shareApi': '' },
         ws: true,
         changeOrigin: true
       }

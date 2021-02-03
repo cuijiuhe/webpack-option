@@ -1,168 +1,160 @@
 <template>
-  <!-- 推广产品 -->
-  <div class="order-container">
-    <div class="order-filter">
-      <el-form :model="form" label-width="left" size="small" :inline="true" label-position="left">
-        <el-form-item label="产品名称">
-          <el-input
-            v-model="form.searchParam.productName"
-            suffix-icon="el-icon-date"
-            placeholder="请输入产品名称"
-            clearable
-          ></el-input>
-        </el-form-item>
-
-        <el-form-item label="产品编码/ID">
-          <el-input
-            v-model="form.searchParam.productCode"
-            suffix-icon="el-icon-date"
-            placeholder="请输入产品编码"
-            clearable
-          ></el-input>
-        </el-form-item>
-
-        <el-form-item label="推广状态">
-          <el-select v-model="form.searchParam.productStatus " placeholder="请选择" clearable>
-            <el-option
-              v-for="item in product_status"
-              :key="item.guid"
-              :label="item.text"
-              :value="item.key"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="产品类型">
-          <el-select v-model="form.searchParam.promoType " placeholder="请选择" clearable>
-            <el-option
-              v-for="item in getFilterProductTypeArr"
-              :key="item.businesstypeName"
-              :label="item.businesstypeName"
-              :value="item.typeIdentifier"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-
-        <el-button type="primary" style="margin-bottom: 20px;" size="small" @click="getList()">查询</el-button>
-      </el-form>
-    </div>
-    <!-- 列表 -->
-    <div class="order-table">
-      <div class="table-tools">
-        <el-button type="primary" size="small" @click="addPromotionalProducts">添加</el-button>
+  <!-- 功能页面  -->
+  <div class="mod-page">
+    <!-- 筛选  -->
+    <el-card class="mod-card mod-filter">
+      <div class="mod-card-body" :class="{'mod-card-body-extend': filterExtend}">
+        <el-form
+          ref="filterForm"
+          :model="filterForm"
+          label-position="right"
+          size="small"
+        >
+          <el-form-item label="产品名称">
+            <el-input
+              v-model="filterForm.searchParam.productName"
+              placeholder="请输入产品名称"
+              clearable
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="产品编码">
+            <el-input
+              v-model="filterForm.searchParam.productCode"
+              placeholder="请输入产品编码"
+              clearable
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="产品状态">
+            <el-select v-model="filterForm.searchParam.productStatus " placeholder="请选择" clearable>
+              <el-option
+                v-for="item in productStatus"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="计划开始时间">
+            <el-date-picker
+              v-model="filterForm.searchParam.productDate1"
+              type="date"
+              placeholder="选择日期">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item label="计划结束时间">
+            <el-date-picker
+              v-model="filterForm.searchParam.productDate2"
+              type="date"
+              placeholder="选择日期">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item label="实际开始时间">
+            <el-date-picker
+              v-model="filterForm.searchParam.productDate3"
+              type="date"
+              placeholder="选择日期">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item label="实际结束时间">
+            <el-date-picker
+              v-model="filterForm.searchParam.productDate4"
+              type="date"
+              placeholder="选择日期">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item v-if="filterLength < 3">
+            <el-button type="default" size="small" @click="handleFilterReset()">重置</el-button>
+            <el-button type="primary" size="small" @click="handleFilterList()">查询</el-button>
+          </el-form-item>
+        </el-form>
       </div>
-      <el-table
-        :data="tableData"
-        border
-        stripe
-        :header-cell-style="{background:'#eef1f6',color:'#606266'}"
-        fit
-        max-height="540"
-      >
-        v-loading="listLoading"
-        height="400px"
+      <div v-if="filterLength >= 3" class="mod-card-footer">
+        <el-button v-if="filterLength > 6" type="text" size="small" @click="handleFilterExtend()">{{ filterExtendText }}<i :class="[filterExtend ? 'el-icon-arrow-up' : 'el-icon-arrow-down']"></i></el-button>
+        <el-button type="default" size="small" @click="handleFilterReset()">重置</el-button>
+        <el-button type="primary" size="small" @click="handleFilterList()">查询</el-button>
+      </div>
+    </el-card>
+    <!-- 列表  -->
+    <el-card class="mod-card mod-table">
+      <div class="mod-card-header" slot="header">
+        <h2 class="mod-card-title">列表数据</h2>
+        <div class="mod-card-tool">
+          <el-button type="primary" size="small" @click="handleShowDialogForm()">添加列表</el-button>
+          <el-button type="default" size="small" @click="toggleSelection()">取消选择</el-button>
+          <el-button type="primary" size="small" @click="toggleSelection([tableList[0], tableList[2]])">选中列表</el-button>
+        </div>
+      </div>
+      <div class="mod-card-body">
+        <el-table
+          :data="tableList"
+          ref="multipleTable"
+          v-loading="tableLoading"
+          tooltip-effect="dark"
+          border
+          stripe
+          @selection-change="handleSelectionChange"
         >
-        <el-table-column
-          prop="promoType"
-          label="产品类型"
-          align="center"
-          :show-overflow-tooltip="true"
-        >
-          <template slot-scope="scope">
-            {{formatPromoType(scope.row.promoType)}}
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="productName"
-          label="产品名称"
-          width="280"
-          align="center"
-          :show-overflow-tooltip="true"
-        ></el-table-column>
-        <el-table-column
-          :show-overflow-tooltip="true"
-          prop="productCode"
-          label="产品ID"
-          width="90"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          :show-overflow-tooltip="true"
-          prop="productNum"
-          label="产品编码"
-          width="120"
-          align="center"
-        ></el-table-column>
-
-        <el-table-column
-          :show-overflow-tooltip="true"
-          prop="excitationType"
-          label="激励方式"
-          align="center"
-        >
-          <template
-            slot-scope="scope"
-          >{{scope.row.excitationType | checkBaseData(excitation_type, excitation_type)}}</template>
-        </el-table-column>
-        <el-table-column
-          :show-overflow-tooltip="true"
-          prop="rewardMoneyShow"
-          label="佣金"
-          align="center"
-        >
-          <!-- <template slot-scope="scope">{{scope.row.channel | checkBaseData(channel, channel)}}</template> -->
-          <!-- <template
-            slot-scope="scope"
-          >{{scope.row.channel == 1 ? '区分渠道' : (scope.row.productChannelVo.length ? scope.row.productChannelVo[0].rewardMoney : '' )}}</template>-->
-        </el-table-column>
-        <el-table-column
-          :show-overflow-tooltip="true"
-          prop="productStatus"
-          label="推广状态"
-          align="center"
-        >
-          <template
-            slot-scope="scope"
-          >{{scope.row.productStatus | checkBaseData(product_status, product_status)}}</template>
-        </el-table-column>
-        <el-table-column
-          :show-overflow-tooltip="true"
-          prop="createrTime"
-          label="发布时间"
-          width="150"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          :show-overflow-tooltip="true"
-          prop="updateTime"
-          label="修改时间"
-          width="150"
-          align="center"
-        ></el-table-column>
-        <el-table-column fixed="right" label="操作" width="180">
-          <template slot-scope="scope">
-            <el-button type="text" size="medium" @click="viewDetails(scope.row.productId)">查看</el-button>
-            <el-button type="text" size="medium" @click="modifyDialog(scope.row.productId)">修改</el-button>
-            <el-button
-              type="text"
-              size="medium"
-              @click="endDialog(scope.row.productId, '2')"
-              v-if="scope.row.productStatus == 1"
-            >结束</el-button>
-            <el-button
-              type="text"
-              size="medium"
-              @click="endDialog(scope.row.productId, '1')"
-              v-if="scope.row.productStatus == 2"
-            >启动</el-button>
-            <el-button type="text" size="medium" @click="deleteDialog(scope.row.productId)">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-
-      <div class="table-pagination">
+          <el-table-column
+            type="selection"
+            width="63"
+          ></el-table-column>
+          <el-table-column
+            fixed
+            label="序号"
+            type="index"
+            width="77"
+          ></el-table-column>
+          <el-table-column
+            prop="date"
+            label="日期"
+            width="130"
+          ></el-table-column>
+          <el-table-column
+            prop="name"
+            label="姓名"
+          ></el-table-column>
+          <el-table-column
+            prop="province"
+            label="省份"
+          ></el-table-column>
+          <el-table-column
+            prop="city"
+            label="市区"
+          ></el-table-column>
+          <el-table-column
+            prop="address"
+            label="地址"
+            show-overflow-tooltip
+          ></el-table-column>
+          <el-table-column
+            prop="zip"
+            label="邮编"
+            width="110"
+          ></el-table-column>
+          <el-table-column
+            fixed="right"
+            label="操作"
+            width="150"
+          >
+            <template slot-scope="scope">
+              <el-button type="text" size="small" @click="handleShowDialogDetail(scope.row)">查看</el-button>
+              <el-dropdown trigger="click">
+                <el-button type="text" size="small">
+                  更多<i class="el-icon-arrow-down el-icon--right"></i>
+                </el-button>
+                <el-dropdown-menu slot="dropdown" size="small">
+                  <el-dropdown-item size="small" @click.native="handleEditItem">编辑</el-dropdown-item>
+                  <el-dropdown-item size="small" @click.native="handleDeleteItem">删除</el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+      <div class="mod-card-footer">
         <el-pagination
           :total="total"
-          :page-size="form.size"
+          :page-size="filterForm.pageSize"
           :page-sizes="[10, 20, 30, 40]"
           background
           layout="total, sizes, prev, pager, next"
@@ -170,293 +162,213 @@
           @size-change="selsChange"
         />
       </div>
-    </div>
-    <!-- 添加推广产品对话框 -->
+    </el-card>
+    <!-- 弹层  -->
     <el-dialog
-      @closed="dialogClosed"
-      title="添加推广产品"
-      :visible.sync="dialogFormVisible"
-      :close-on-click-modal="false"
+      class="mod-dialog"
+      title="弹层标题"
+      :visible.sync="dialogForms"
+      @close="handleCloseDialogForm"
     >
-      <el-form
-        :model="addForm"
-        :inline="true"
-        :label-position="labelPosition"
-        size="small"
-        ref="addForm"
-        :rules="rules"
-      >
-      <el-row>
-        <el-col :span='12'>
-          <el-form-item label="产品类型" :label-width="formLabelWidth">
-              <el-select v-model="addForm.promoType" @change="choseType" placeholder="请选择产品类型">
-                <el-option
-                  v-for="item in selectProductType"
-                  :key="item.businesstypeName"
-                  :label="item.businesstypeName"
-                  :value="item.typeIdentifier"
-                ></el-option>
+      <el-card class="mod-card mod-form">
+        <div class="mod-card-header" slot="header">
+          <h2 class="mod-card-title">表单标题</h2>
+        </div>
+        <div class="mod-card-body">
+          <el-form
+            ref="dialogForm"
+            size="small"
+            :model="dialogForm"
+            :rules="dialogFormRules"
+          >
+            <el-form-item label="活动名称" prop="name">
+              <el-input v-model="dialogForm.name" placeholder="请输入活动名称"></el-input>
+            </el-form-item>
+            <el-form-item label="活动区域" prop="region">
+              <el-select v-model="dialogForm.region" placeholder="请选择活动区域">
+                <el-option label="区域一" value="shanghai"></el-option>
+                <el-option label="区域二" value="beijing"></el-option>
               </el-select>
             </el-form-item>
-        </el-col>
-      </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="产品编码" :label-width="formLabelWidth" prop="productCode">
-              <el-select v-model="addForm.productCode" @input="productCodeChange" placeholder="请选择">
-                <el-option
-                  v-for="item in product_code"
-                  :key="item.guid"
-                  :label="item.key"
-                  :value="item.key"
-                ></el-option>
-              </el-select>
+            <el-form-item label="活动时间" required>
+              <el-date-picker
+                type="daterange"
+                range-separator="-"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                v-model="dialogForm.date1"
+              ></el-date-picker>
             </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="产品名称" :label-width="formLabelWidth" prop="productName">
-              <el-input class="size-input" v-model="addForm.productName"></el-input>
+            <el-form-item label="创建时间" required>
+              <el-date-picker
+                type="date"
+                placeholder="选择创建时间"
+                v-model="dialogForm.date2"
+              ></el-date-picker>
             </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="状态" :label-width="formLabelWidth" prop="productStatus">
-              <el-select class="size-input" v-model="addForm.productStatus" placeholder="请选择">
-                <el-option
-                  v-for="item in product_status"
-                  :key="item.guid"
-                  :label="item.text"
-                  :value="item.key"
-                ></el-option>
-              </el-select>
+            <el-form-item label="即时配送" prop="delivery">
+              <el-switch v-model="dialogForm.delivery"></el-switch>
             </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="url" :label-width="formLabelWidth">
-              <el-input class="size-input" v-model="addForm.productUrl"></el-input>
+            <el-form-item label="活动性质" prop="type">
+              <el-checkbox-group v-model="dialogForm.type">
+                <el-checkbox label="美食/餐厅线上活动" name="type"></el-checkbox>
+                <el-checkbox label="地推活动" name="type" checked></el-checkbox>
+                <el-checkbox label="线下主题活动" name="type"></el-checkbox>
+                <el-checkbox label="单纯品牌曝光" name="type"></el-checkbox>
+              </el-checkbox-group>
             </el-form-item>
-          </el-col>
-        </el-row>
-
-        <el-form-item label="推广描述" :label-width="formLabelWidth">
-          <el-input maxlength="50" style="width:660px;" v-model="addForm.productDesc"></el-input>
-        </el-form-item>
-
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="激励方式" :label-width="formLabelWidth" prop="excitationType">
-              <el-select
-                @change="excitationChange"
-                class="size-input"
-                v-model="addForm.excitationType"
-                placeholder="请选择"
-              >
-                <el-option
-                  v-for="item in excitation_type"
-                  :key="item.guid"
-                  :label="item.text"
-                  :value="item.key"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="是否区分用户渠道奖励" :label-width="formLabelWidth" prop="channel">
-              <el-radio-group v-model="addForm.channel" @change="differentiateChannels">
-                <el-radio :label="1">是</el-radio>
-                <el-radio :label="2">否</el-radio>
+            <el-form-item label="特殊资源申请" prop="resource">
+              <el-radio-group v-model="dialogForm.resource">
+                <el-radio label="线上品牌商赞助"></el-radio>
+                <el-radio label="线下场地免费"></el-radio>
               </el-radio-group>
             </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row v-if="addForm.channel == 1">
-          <el-form-item  v-for="(item, index) in filteredType" :key="index + item.channelName" :label="item.channelName" :label-width="formLabelWidth">
-            <el-input class="size-input" v-model="item.rewardMoney"></el-input>
-          </el-form-item>
-        </el-row>
-        <el-row v-else>
-            <el-col :span="12" v-for="(item,index) in addForm.channelVoList" :key="item.guid">
-              <el-form-item
-                :label="item.channelName"
-                :label-width="formLabelWidth"
-                :prop="'channelVoList.' +index+ '.rewardMoney'"
+            <el-form-item label="活动形式" prop="desc">
+              <el-input type="textarea" v-model="dialogForm.desc"></el-input>
+            </el-form-item>
+          </el-form>
+        </div>
+      </el-card>
+      <div class="dialog-footer" slot="footer">
+        <el-button size="small" @click="handleCloseDialogForm()">取消</el-button>
+        <el-button type="primary" size="small" :loading="loading" @click.native.prevent="handleSubmitForm()">提交</el-button>
+      </div>
+    </el-dialog>
+    <!-- 弹层  -->
+    <el-dialog
+      class="mod-dialog"
+      title="弹层标题"
+      :visible.sync="dialogDetails"
+      @close="handleCloseDialogDetail"
+    >
+      <el-card class="mod-card mod-detail">
+        <div class="mod-card-header" slot="header">
+          <h2 class="mod-card-title">基本信息</h2>
+        </div>
+        <div class="mod-card-body">
+          <ul class="mod-list">
+            <li class="mod-list-item">
+              <span class="mod-list-label">订单编号</span>
+              <el-tooltip
+                effect="dark"
+                :content="detailData.orderCode"
+                placement="top"
               >
-                <el-input
-                  :placeholder="placeholderCotent"
-                  type="number"
-                  class="size-input"
-                  v-model="item.rewardMoney"
-                ></el-input>
-              </el-form-item>
-            </el-col>
-          </el-row>
-        <el-row>
-          <!-- <el-col :span="12" v-if="addForm.channel == 2">
-            <el-form-item
-              v-for="(item,index) in addForm.channelVoList"
-              :key="item.guid"
-              :label="item.channelName"
-              :label-width="formLabelWidth"
-              :prop="'channelVoList.'+index+ '.rewardMoney'"
+                <span class="mod-list-value">{{ detailData.orderCode }}</span>
+              </el-tooltip>
+            </li>
+            <li class="mod-list-item">
+              <span class="mod-list-label">订单类型</span>
+              <span class="mod-list-value">
+                {{ detailData.orderType }}
+              </span>
+            </li>
+            <li class="mod-list-item">
+              <span class="mod-list-label">来源渠道</span>
+              <span class="mod-list-value">
+                {{ detailData.orderChannel }}
+              </span>
+            </li>
+            <li class="mod-list-item">
+              <span class="mod-list-label">会员手机号</span>
+              <span class="mod-list-value">
+                {{ detailData.memberPhone }}
+              </span>
+            </li>
+            <li class="mod-list-item">
+              <span class="mod-list-label">会员ID</span>
+              <span class="mod-list-value">
+                {{ detailData.payMember }}
+              </span>
+            </li>
+            <li class="mod-list-item">
+              <span class="mod-list-label">订单创建时间</span>
+              <span class="mod-list-value">
+                {{ detailData.payTime }}
+              </span>
+            </li>
+            <li class="mod-list-item">
+              <span class="mod-list-label">订单完成时间</span>
+              <span class="mod-list-value">
+                {{ detailData.completeTime }}
+              </span>
+            </li>
+          </ul>
+        </div>
+      </el-card>
+      <el-card class="mod-card mod-table">
+        <div class="mod-card-header" slot="header">
+          <h2 class="mod-card-title">商品信息</h2>
+        </div>
+        <div class="mod-card-body">
+          <el-table
+            :data="detailTable"
+            ref="detailTable"
+            v-loading="tableLoading"
+            tooltip-effect="dark"
+            border
+            stripe
+          >
+            <el-table-column
+              fixed
+              label="序号"
+              type="index"
+              width="77"
+            ></el-table-column>
+            <el-table-column
+              prop="productId"
+              label="产品ID"
+              width="140"
+              show-overflow-tooltip
+            ></el-table-column>
+            <el-table-column
+              prop="productName"
+              label="产品名称"
+              width="160"
+              show-overflow-tooltip
+            ></el-table-column>
+            <el-table-column
+              prop="productImg"
+              label="产品图片"
+              width="105"
             >
-              <el-input
-                :placeholder="placeholderCotent"
-                type="number"
-                class="size-input"
-                v-model="item.rewardMoney"
-              ></el-input>
-            </el-form-item>
-          </el-col> -->
-
-
-
-          <!-- <div v-else>
-            <el-col :span="12" v-for="(item,index) in addForm.channelVoList" :key="item.guid">
-              <el-form-item
-                :label="item.channelName"
-                :label-width="formLabelWidth"
-                :prop="'channelVoList.' +index+ '.rewardMoney'"
-              >
-                <el-input
-                  :placeholder="placeholderCotent"
-                  type="number"
-                  class="size-input"
-                  v-model="item.rewardMoney"
-                ></el-input>
-              </el-form-item>
-            </el-col>
-          </div> -->
-          <el-col :span="11">
-            <el-form-item label="结算标准" :label-width="formLabelWidth" prop="settlementStandard">
-              <el-select class="size-input" v-model="addForm.settlementStandard" placeholder="请选择">
-                <el-option
-                  v-for="item in settlement_standard"
-                  :key="item.guid"
-                  :label="item.text"
-                  :value="item.key"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="结算周期" :label-width="formLabelWidth" prop="settlementCycle">
-              <el-input class="size-input" v-model="addForm.settlementCycle" placeholder="天"></el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="addPromoteProducts('addForm')" size="small">保 存</el-button>
-        <el-button @click="dialogFormVisible = false" size="small">取 消</el-button>
+              <template slot-scope="scope">
+                <el-image
+                  :src="scope.row.productImg"
+                  fit="cover"
+                  style="display:block;width:48px;height:48px;margin: 0 auto;"
+                ></el-image>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="salesPrice"
+              label="产品单价"
+              width="105"
+            ></el-table-column>
+            <el-table-column
+              prop="totalQuantity"
+              label="产品数量"
+              width="105"
+              show-overflow-tooltip
+            ></el-table-column>
+            <el-table-column
+              prop="totalPrice"
+              label="产品应付金额"
+              width="133"
+            ></el-table-column>
+          </el-table>
+        </div>
+      </el-card>
+      <div class="dialog-footer" slot="footer">
+        <el-button type="primary" size="small" @click="handleCloseDialogDetail()">关闭</el-button>
       </div>
-    </el-dialog>
-    <!-- 查看详情对话框 -->
-    <el-dialog @closed="dialogClosed" width="50%" title="推广详情" :visible.sync="dialogTableVisible">
-      <el-row>
-        <el-col>
-          <div class="dynamic-tips">
-            <i class="el-icon-warning"></i>
-            当前产品状态在{{productDetail.productStatus | checkBaseData(product_status, product_status)}}
-          </div>
-        </el-col>
-        <el-col class="details-content">产品名称： {{productDetail.productName}}</el-col>
-        <!-- <el-col class="details-content">产品编码： {{productDetail.productCode | checkBaseData(product_code, product_code)}}</el-col> -->
-        <el-col class="details-content">产品编码： {{productDetail.productNum}}</el-col>
-        <el-col
-          class="details-content"
-        >激励方式： {{productDetail.excitationType | checkBaseData(excitation_type, excitation_type)}}</el-col>
-        <el-col
-          class="details-content"
-        >佣金是否区分渠道：{{productDetail.channel | checkBaseData(channel, channel)}}</el-col>
-        <el-col
-          class="details-content"
-          v-for="(item,index) in channelVoList"
-          :key="index"
-        >{{item.channelName}}：{{item.rewardMoney}}</el-col>
-        <el-col class="details-content">url：{{productDetail.productUrl}}</el-col>
-        <el-col
-          class="details-content"
-        >推广状态：{{productDetail.productStatus | checkBaseData(product_status, product_status)}}</el-col>
-        <el-col
-          class="details-content"
-        >结算标准：{{productDetail.settlementStandard | checkBaseData(settlement_standard, settlement_standard)}}</el-col>
-        <el-col class="details-content">结算周期：{{productDetail.settlementCycle}}</el-col>
-        <el-col class="details-content">描述：{{productDetail.productDesc}}</el-col>
-      </el-row>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogTableVisible = false" size="small">确 定</el-button>
-        <el-button @click="dialogTableVisible = false" size="small">取 消</el-button>
-      </div>
-    </el-dialog>
-    <!-- 修改 -->
-    <el-dialog :visible.sync="dialogVisible" width="30%">
-      <div class="icon-box">
-        <i class="el-icon-warning"></i>
-      </div>
-      <div class="text-content">
-        <span>进行中的推广请慎重修改</span>
-        <br />
-        <span>修改后会影响后续产生的推广订单</span>
-        <br />
-        <span>确定要继续执行该操作吗？</span>
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="showModifyDialog" size="small">确 定</el-button>
-        <el-button @click="dialogVisible = false" size="small">取 消</el-button>
-      </span>
-    </el-dialog>
-    <!-- 结束 -->
-    <el-dialog :visible.sync="dialogEnd" width="30%">
-      <div class="icon-box">
-        <i class="el-icon-warning"></i>
-      </div>
-      <div class="text-content">
-        <span class="end-text">结束后的推广，产生后的订单将自动失效</span>
-        <span class="end-text">不在进行奖励</span>
-        <br />
-        <span class="end-text">确定要继续结束推广码？</span>
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="endConfirmation" size="small">确 定</el-button>
-        <el-button @click="dialogEnd = false" size="small">取 消</el-button>
-      </span>
-    </el-dialog>
-    <!-- 删除 -->
-    <el-dialog :visible.sync="dialogDelete" width="30%">
-      <div class="icon-box">
-        <i class="el-icon-warning"></i>
-      </div>
-      <div class="text-content">
-        <span>确定要删除吗</span>
-        <br />
-        <span>删除操作无法撤销,确定要删除吗</span>
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="removeProduct" size="small">确 定</el-button>
-        <el-button @click="dialogDelete = false" size="small">取 消</el-button>
-      </span>
     </el-dialog>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from "vue-property-decorator";
+import { Component, Vue } from "vue-property-decorator";
 import { Form as ElForm } from "element-ui";
-import { UserModule } from "@/store/modules/user";
-import { exportRafficData } from "@/api/common";
-import {
-  getProductList,
-  getDetailByProductList,
-  addProduct,
-  changeProductStatus,
-  deleteProduct,
-  queryProductConfigurationType,
-  queryAccordingToProduct,
-  queryProductConfiguration
-} from "@/api/equitesProduct";
-
-import { getDictionaryList } from "@/api/common";
 
 declare module "vue/types/vue" {
   interface Vue {
@@ -465,96 +377,32 @@ declare module "vue/types/vue" {
 }
 
 @Component({
-  name: "productpopularization",
+  name: "Table",
 })
 export default class extends Vue {
   // 查询参数
-  private form = {
-    current: 1,
+  private filterForm = {
     searchParam: {
-      productCode: "",
-      productName: "",
-      productStatus: "",
-      promoType: ""
+      productCode: '',
+      productName: '',
+      productDate1: '',
+      productDate2: '',
+      productDate3: '',
+      productDate4: '',
+      productStatus: '',
+      productType: ''
     },
-    size: 20,
+    pageIndex: 1,
+    pageSize: 10,
   };
-  channel_code: object[] = [];
-  channelVoList: object[] = [];
-  noVoList: object[] = [];
-  // 添加推广产品
-  private addForm: any = {
-    /*
-      channel (integer, optional): 是否区分渠道 1是 2否 ,
-      channelVoList (Array[渠道], optional): 渠道集合 ,
-      deleteFlag (integer, optional): 1-未删除，2-删除 ,
-      excitationType (integer, optional): 激励方式1 固定金额 2 实付金额 ,
-      productCode (string, optional): 产品编码 ,
-      productDesc (string, optional): 产品推广描述 ,
-      productId (integer, optional),
-      productName (string, optional): 产品名称 ,
-      productStatus (integer, optional): 0 未开始 1进行中 2已停止 ,
-      productType (string, optional): 产品类型 付费会员； ETC ,
-      productUrl (string, optional): 活动地址 ,
-      settlementCycle (integer, optional): 结算周期 单位天 ,
-      settlementStandard (integer, optional): 结算标准 根据产品类型去查询,不同的类型 标准不一样settlementStandard
-    */
-    productName: "",
-    productCode: "",
-    productStatus: "",
-    productUrl: "",
-    productDesc: "",
-    excitationType: "",
-    channel: 1,
-    settlementCycle: "",
-    settlementStandard: "",
-    promoType: "",//产品类型
-    channelVoList: this.channelVoList,
-  };
-  productDetail: object = {};
-  // 推广状态
-  product_status = [];
-  private dialogFormVisible = false; // 添加
-  private dialogTableVisible = false; // 查看详情
-  private dialogVisible = false; // 修改
-  private dialogEnd = false; // 结束
-  private dialogDelete = false; // 删除
-  private labelPosition = "top";
-  private productId = "";
-  private placeholderCotent = "";
-  private endId: any = "";
-  private endStatus: any = "";
-  private addNum = 0;
-  excitation_type = [];
-  settlement_standard = [];
-  channel = [];
-  product_code = [];
-  private singleChannel = []; // 缓存单渠道
-  private multiChannel = []; // 缓存多渠道
-  selectProductType:any = [];
-  chosedProductType:any = [];// 选完产品类型后过滤出的服务商
-
-  filteredType:any = []//匹配之后需要渲染的列表
-  getFilterProductTypeArr: any = []//产品类型筛选条件
-  commission = (rule: any, value: any, callback: any) => {
-    if (!value) {
-      return callback(new Error("佣金不能为空"));
-    }
-    if (typeof value !== "number" && isNaN(value)) {
-      callback(new Error("佣金是数字"));
-    }
-    callback();
-  };
-  checkAge = (rule: any, value: any, callback: any) => {
-    if (!value) {
-      return callback(new Error("周期天数不能为空"));
-    }
-    if (typeof value !== "number" && isNaN(value)) {
-      callback(new Error("周期天数是数字"));
-    }
-    callback();
-  };
-  private rules: any = {
+  // 查询参数个数
+  private filterLength = 0;
+  // 是否展开筛选项
+  private filterExtend = false;
+  // 是否展开筛选项按钮内容：展开/收起
+  private filterExtendText = '展开';
+  // 筛选项表单验证规则
+  private filterformRules: any = {
     productName: [
       { required: true, message: "请输入产品名称", trigger: "blur" },
       { min: 2, max: 50, message: "请输入2-50个汉字", trigger: "blur" },
@@ -566,14 +414,6 @@ export default class extends Vue {
     settlementStandard: [
       { required: true, message: "请选择结算标准", trigger: "change" },
     ],
-    // productUrl: [
-    //   { required: true, message: "请输入url", trigger: "blur" },
-    //   { min: 1, max: 190000, message: "请输入url", trigger: "blur" },
-    // ],
-    // productDesc: [
-    //   { required: true, message: "请输入描述信息", trigger: "blur" },
-    //   { min: 5, max: 50, message: "请输入5-50个汉字", trigger: "blur" },
-    // ],
     excitationType: [
       { required: true, message: "请选择激励方式", trigger: "change" },
     ],
@@ -586,562 +426,280 @@ export default class extends Vue {
     ],
     settlementCycle: [{ validator: this.checkAge, trigger: "blur" }],
   };
-  private total: number = 0;
-  // 列表
-  private tableData = [];
-  private formLabelWidth = "80px";
-  private size = "padding-left:50px";
-  private listLoading = false;
-  //
+  // 列表数据
+  private tableData = [{
+    date: '2016-05-01',
+    name: '王小虎',
+    province: '上海',
+    city: '普陀区',
+    address: '上海市普陀区金沙江路 1519 弄',
+    zip: 200333
+  }, {
+    date: '2016-05-02',
+    name: '王小虎',
+    province: '上海',
+    city: '普陀区',
+    address: '上海市普陀区金沙江路 1518 弄',
+    zip: 200333
+  }, {
+    date: '2016-05-03',
+    name: '王小虎',
+    province: '上海',
+    city: '普陀区',
+    address: '上海市普陀区金沙江路 1516 弄',
+    zip: 200333
+  }, {
+    date: '2016-05-04',
+    name: '王小虎',
+    province: '上海',
+    city: '普陀区',
+    address: '上海市普陀区金沙江路 1517 弄',
+    zip: 200333
+  }]
+  private multipleTable: any;
+  private tableList: any[] = [];
+  private multipleSelection: any[] = [];
+  private tableLoading = false;
+  private total: number = 40;
+  private productStatus: any[] = [{
+    label: '已使用',
+    value: '01'
+  }, {
+    label: '未使用',
+    value: '02'
+  }, {
+    label: '已过期',
+    value: '03'
+  }]
+  private dialogForms = false;
+  private dialogForm = {
+    name: '',
+    region: '',
+    date1: '',
+    date2: '',
+    delivery: false,
+    type: [],
+    resource: '',
+    desc: ''
+  }
+
+  private dialogFormRules = {
+    name: [
+      { required: true, message: '请输入活动名称', trigger: 'blur' },
+      { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+    ],
+    region: [
+      { required: true, message: '请选择活动区域', trigger: 'change' }
+    ],
+    date1: [
+      { type: 'daterange', required: true, message: '请选择日期', trigger: ['change', 'blur'] }
+    ],
+    date2: [
+      { type: 'date', required: true, message: '请选择创建时间', trigger: ['change', 'blur'] }
+    ],
+    type: [
+      { type: 'array', required: true, message: '请至少选择一个活动性质', trigger: 'change' }
+    ],
+    resource: [
+      { required: true, message: '请选择活动资源', trigger: 'change' }
+    ],
+    desc: [
+      { required: true, message: '请填写活动形式', trigger: 'blur' }
+    ]
+  }
+  private detailData = {
+    productName: '车联网服务(重卡版)', // 产品名称
+    marketPrice: '399', // 产品价格
+    orderCode: '167078920210131011393933030307881f53c7', // 订单编号
+    payMember: '1670789', // 会员号
+    phone: '13811821894', // 手机号
+    orderStatus: '已完成', // 订单状态
+    price: '399', // 商品价格
+    totalPrice: '399', // 订单总金额
+    transportPrice: '0', // 运费金额
+    discountPrice: '0', // 优惠金额
+    paymentAmount: '399', // 实付金额
+    isApplyInvoice: '是', // 是否开具发票
+    payType: '在线支付', // 支付类型
+    payCode: 'PAY167078920210131011030789fea93e', // 支付流水号
+    payAmount: '399', // 实付金额
+    disTotalPrice: '0', // 优惠总金额
+    disPrice:'0', // 优惠券优惠
+    redEnvelopePrice: '0', // 红包抵扣金额
+    deductFromPoint: '0', // 积分金额
+    disNum: '0', // 优惠券使用张数
+    pointsNum: '0', // 抵扣积分
+    pointsPrice: '0', // 积分抵扣金额
+    titleType: '个人', // 发票抬头
+    title: '个人', // 个人或公司名称
+    invoiceMobile: '张二狗', // 个人或公司名称
+    payTime: '2021-01-31 01:10:45', // 订单支付时间
+    completeTime: '2021-01-31 01:10:45', // 订单完成时间
+    payChannel: '微信', // 支付方式
+    enterpriseType: '电子普通发票', // 发票类型
+    taxPayerIdentification: '', // 识别纳税人
+    invoiceContent: '', // 发票内容
+    invoiceStatus: '', // 发票状态
+    invoiceStatusName: '开票中', // 开票状态
+    reasonType: '', // 售后类型
+    cancelStatus: '', //  售后状态
+    customCancelReason: '', // 售后描述
+    enterpriseInvoiceMail: '', // 发票邮箱
+    productNum: '1', // 产品数量
+    createTime: '2021-01-31 01:10:31', // 下单日期
+    orderType: '普通订单', // 订单类型
+    payStatus: '已支付', // 支付状态
+    cancelCode: '', // 退款单编号
+    orderChannel: '福田e家', // 来源渠道
+    memberPhone: '13811821894', //会员手机号
+  };
+  private detailTable: any[] = [{
+    productId: '1-ZNRRMHD', // 产品id
+    productName: '车联网服务(重卡版)', // 产品名称
+    totalQuantity: '399', // 产品单价
+    产品数量: '1', // 手机号
+    orderStatus: '已完成', // 订单状态
+    salesPrice: '399', // 产品单价
+    totalPrice: '399', // 产品应付金额
+    productImg: 'https://obs-fix-video.obs.cn-north-1.myhwclouds.com/e8324d8b13a44d6f94bbf6b28c2edc13.png', // 产品图片
+  }]
+  private dialogDetails = false;
+  private loading = false;
+
   mounted() {
-    this.fetchDictionaryList("product_status");
-    this.fetchDictionaryList("excitation_type");
-    this.fetchDictionaryList("settlement_standard");
-    this.fetchDictionaryList("channel");
-    this.fetchDictionaryList("product_code");
-    this.fetchDictionaryList("channel_code");
-    this.filterList();
-    this.getProductType();
-    this.getFilterProductType();
-  }
-  @Watch("addForm.channelVoList")
-  getChannelVoList(newVal: any) {
-    newVal.forEach((item: any, index: number) => {
-      let a = "channelVoList." + `${index}` + ".rewardMoney";
-      this.rules[a] = [{ validator: this.commission, trigger: "blur" }];
-    });
-  }
-
-  choseType(val:any){
-    console.log(typeof(val))
-    // chosedProductType
-    let choseArr:any = [];
-    console.log(this.selectProductType)
-    this.selectProductType.forEach((item:any)=>{
-      if(val == item.typeIdentifier){
-        this.chosedProductType = item.authorizedChannel;
-        // this.addForm.settlementStandard = item.settlementTime;
-        let chosedObjs:any = []
-        this.settlement_standard.forEach((jtem:any)=>{
-          if(item.settlementTime == jtem.key){
-            chosedObjs.push(jtem)
-            this.settlement_standard = chosedObjs;
-            this.addForm.settlementStandard = jtem.key;
-          }
-        })
-      }
-    })
-    
-    let lastChoseArr:any = [];
-    this.channel_code.forEach((item:any)=>{
-      this.chosedProductType.forEach((jtem:any)=>{
-        if(item.text == jtem){
-          let obj:any = {
-            channelCode: `0${item.key}`,
-            channelId: null,
-            channelName: item.text,
-            productId: null,
-            rewardMoney: ''
-          }
-          lastChoseArr.push(obj);
-        }
-      })
-    })
-    this.filteredType = lastChoseArr;
-    this.addForm.channelVoList = lastChoseArr
-
- //带出产品编码和产品名称
-
-    if(typeof(val)=='string'){
-      this.getTpyeNames(val); 
-    }
-  }
-  formatPromoType(promoTypes: any){
-    // let retArr:any = '';
-    // this.getFilterProductTypeArr.forEach((item:any)=>{
-    //   if(promoTypes == item.typeIdentifier){
-    //     retArr = item.businesstypeName;
-    //   }
-    // })
-    // return retArr;
-
-
-
-    let newRetArr = this.getFilterProductTypeArr.filter((item:any)=>{
-      return item.typeIdentifier == promoTypes;
-    })
-    return newRetArr[0].businesstypeName;
-  }
-  async getTpyeNames(vals: any){
-    const { data } = await queryAccordingToProduct({
-      typeIdentifier: vals
-    })
-    console.log(data.data)
-    let newTypeNames = data.data;
-    if(newTypeNames){
-      let codeNameArr:any = [];
-      newTypeNames.forEach((item:any)=>{
-        // if(vals == item.promoType){
-          codeNameArr.push(
-            {key: item.productCode, text: item.productName}
-          )
-          this.addForm.productCode = item.productCode;
-          this.addForm.productName = item.productName;
-        // }
-      })
-      this.product_code = codeNameArr;
-    }
-  }
-  // 获取字典项
-  private async fetchDictionaryList(type: any) {
-    const _self = this;
-    const { data } = await getDictionaryList({
-      type,
-    });
-    _self[type] = data.data.map((item: any) => {
-      if (Number(item.key)) {
-        item.key = Number(item.key);
-      }
-      if (type === "product_status") {
-        item.key = item.key.toString();
-      }
-      return item;
-    });
-    if (type === "channel_code") {
-      this.dictionaryConversion(_self[type]);
-    }
-
-    // let a = this.channel_code.map((item: any) => {
-    //   let text = item.text,
-    //     key = item.key === "00" ? item.key : "0" + item.key;
-    //   item = { channelName: text, channelCode: key };
-    //   this.$set(item, "rewardMoney", "");
-    //   return item;
-    // });
-    // let b = a.filter((item: any) => {
-    //   if (item.channelCode !== 0) {
-    //     item.channelName = item.channelName + "佣金";
-    //   }
-    //   return item.channelCode !== 6;
-    // });
-    // this.channelVoList = b.filter((item: any) => {
-    //   return (
-    //     item.channelCode == "02" ||
-    //     item.channelCode == "03" ||
-    //     item.channelCode == "04" ||
-    //     item.channelCode == "05"
-    //   );
-    // });
-    // this.noVoList = b.filter((item: any) => {
-    //   if (item.channelCode == "00") {
-    //     item.channelName = "佣金";
-    //     return item.channelCode == "00";
-    //   }
-    // });
-  }
-  // 抽离字典数据处理
-  private dictionaryConversion(val: any) {
-    let a = val.map((item: any) => {
-      let text = item.text,
-        key = item.key === "00" ? item.key : "0" + item.key;
-      item = { channelName: text, channelCode: key };
-      this.$set(item, "rewardMoney", "");
-      return item;
-    });
-    let b = a.filter((item: any) => {
-      if (item.channelCode !== 0) {
-        item.channelName = item.channelName + "佣金";
-      }
-      return item.channelCode !== 6;
-    });
-    this.channelVoList = b.filter((item: any) => {
-      return (
-        item.channelCode == "02" ||
-        item.channelCode == "03" ||
-        item.channelCode == "04" ||
-        item.channelCode == "05"
-      );
-    });
-    this.noVoList = b.filter((item: any) => {
-      if (item.channelCode == "00") {
-        item.channelName = "佣金";
-        return item.channelCode == "00";
-      }
-    });
-  }
-  // 激励方式下拉change事件
-  private excitationChange(val: any) {
-    if (val == 1) {
-      this.placeholderCotent = "请输入固定金额单位:                         元";
-    } else if (val == 2) {
-      this.placeholderCotent = "请输入实付金额单位:                          %";
-    }
-  }
-  //产品类型筛选条件下拉
-  async getFilterProductType(){
-    const { data } = await queryProductConfiguration({});
-    this.getFilterProductTypeArr = data.data;
-    console.log(this.getFilterProductTypeArr)
-    await this.unshiftAll();
-  }
-  unshiftAll(){
-    this.getFilterProductTypeArr.unshift({businesstypeName: "全部",typeIdentifier: "all"})
-  }
-  // 打开推广产品添加dialog
-  private addPromotionalProducts() {
-    if (this.addNum === 0) {
-      this.fetchDictionaryList("channel_code");
-    } else if (this.addNum == 1) {
-      // 查看
-      this.addForm.channel = 1;
-      this.fetchDictionaryList("channel_code");
-      setTimeout(() => {
-        this.addForm.channelVoList = this.channelVoList;
-      }, 0.2 * 1000);
-    } else if (this.addNum == 2) {
-      // 修改
-      this.fetchDictionaryList("channel_code");
-      setTimeout(() => {
-        this.addForm.channelVoList = this.channelVoList;
-      }, 0.2 * 1000);
-    }
-  this.getProductType();
-    // this.addForm.channel = 1;
-    // if (this.addForm.channel === 1) {
-    //   console.log(555);
-    //   this.fetchDictionaryList("channel_code");
-    //   setTimeout(() => {
-    //     console.log(999);
-    //     this.addForm.channelVoList = this.channelVoList;
-    //   }, 0.2 * 1000);
-    // }
-    this.addForm.productUrl = "";
-    this.addForm.productDesc = "";
-    this.dialogFormVisible = true;
-    this.$nextTick(() => {
-      this.addForm.channelVoList = this.channelVoList;
-      let FormData: any = this.$refs["addForm"];
-      try {
-        FormData.resetFields();
-      } catch (error) {
-        throw error;
-      }
-    });
-  }
-  //调用产品类型接口
-  async getProductType(){
-    const { data } = await queryProductConfigurationType({});
-    this.selectProductType = data.data;
-  }
-  // 提交 添加推广产品
-  private async addPromoteProducts(formName: any) {
-    let FormData: any = this.$refs[formName];
-    FormData.validate(async (valid: any) => {
-      if (valid) {
-        const { data } = await addProduct(this.addForm);
-        this.$message.success(data.message);
-        this.dialogFormVisible = false;
-        this.filterList();
-      } else {
-        console.log("error submit!!");
-        return false;
-      }
-    });
-  }
-  private productCodeChange(val: any) {
-
-    let j: any;
-    j = this.product_code.find((item: any) => {
-      //这里的userList就是上面遍历的数据源
-      return item.key === val; //筛选出匹配数据
-    });
-    this.addForm.productName = j.text;
-  }
-  // 是否区分用户渠道奖励 change
-  private differentiateChannels(i: any) {
-    if (this.addNum === 2) {
-      // 修改
-      if (i === 1) {
-        // console.log(1);
-        // console.log("multiChannel", this.multiChannel);
-        if (this.multiChannel.length !== 0) {
-          // console.log("多渠 道");
-          this.addForm.channelVoList = this.multiChannel;
-        } else {
-          this.fetchDictionaryList("channel_code");
-          setTimeout(() => {
-            this.addForm.channelVoList = this.channelVoList;
-          }, 0.2 * 1000);
-        }
-      } else if (i === 2) {
-        // console.log(2);
-        // console.log("singleChannel", this.singleChannel);
-        if (this.singleChannel.length !== 0) {
-          // console.log("单渠道");
-          this.addForm.channelVoList = this.singleChannel;
-        } else {
-          // console.log("多渠道");
-          this.fetchDictionaryList("channel_code");
-          setTimeout(() => {
-            this.addForm.channelVoList = this.noVoList;
-          }, 0.2 * 1000);
-        }
-      }
-    } else if (this.addNum === 1) {
-      // console.log(3);
-      i != 1
-        ? (this.addForm.channelVoList = this.noVoList)
-        : (this.addForm.channelVoList = this.channelVoList);
-    } else if (this.addNum === 0) {
-      // console.log(4);
-      i != 1
-        ? (this.addForm.channelVoList = this.noVoList)
-        : (this.addForm.channelVoList = this.channelVoList);
-    }
-  }
-  // 推广产品详情 接口
-  private async handleProductDetails(id: string) {
-    let { data } = await getDetailByProductList(id);
-    this.productDetail = data.data;
-    this.channelVoList = data.data.channelVoList;
-    this.addForm = data.data;
-    if (data.data.channelVoList.length === 1) {
-      this.singleChannel = data.data.channelVoList;
-    } else {
-      this.multiChannel = data.data.channelVoList;
-      this.filteredType = data.data.channelVoList;
-    }
-  }
-
-  // 打开推广详情dialog
-  private viewDetails(id: string) {
-    this.addNum = 1;
-    this.dialogTableVisible = true;
-    this.handleProductDetails(id);
-  }
-
-  // 打开修改dialog
-  private modifyDialog(id: string) {
-    this.addNum = 2;
-    this.dialogVisible = true;
-    this.productId = id;
-  }
-
-  // 修改确定 打开推广产品更改dialog并读取数据
-  private showModifyDialog() {
-    this.dialogVisible = false;
-    this.handleProductDetails(this.productId);
-    this.dialogFormVisible = true;
-  }
-
-  // 打开结束dialog
-  private async endDialog(productId: string, status: string) {
-    if (status === "1") {
-      // 启动
-      const { data } = await changeProductStatus(productId, status);
-      let message = data.message;
-      if (message !== "修改成功") {
-        this.$message.error(`操作推广以${message}`);
-      } else {
-        this.$message.success(`操作推广以${message}`);
-      }
-      this.filterList();
-    } else if (status === "2") {
-      this.dialogEnd = true;
-      this.endId = productId;
-      this.endStatus = status;
-      this.filterList();
-    }
-  }
-  // 结束 确定
-  private async endConfirmation() {
-    // { productId, status }: { productId: any, status: any }
-    // let endId = this.endId;
-    // let endStatus = this.endStatus;
-    const { data } = await changeProductStatus(this.endId, this.endStatus);
-    let message = data.message;
-    if (message !== "修改成功") {
-      this.$message.error(`操作推广以${message}`);
-    } else {
-      this.$message.success(`操作推广以${message}`);
-    }
-    this.dialogEnd = false;
-    this.filterList();
-  }
-
-  // 打开删除dialog
-  private deleteDialog(id: string) {
-    this.dialogDelete = true;
-    this.productId = id;
-  }
-
-  // 删除推广产品
-  private async removeProduct() {
-    this.dialogDelete = false;
-    const { data } = await deleteProduct(this.productId);
-    let message = data.message;
-    let code = data.code;
-    if (code === 0) {
-      this.$message.error(`产品${message}`);
-    } else {
-      this.$message.success(`产品${message}`);
-    }
-
-    this.filterList();
+    this.multipleTable = this.$refs.multipleTable;
+    this.filterLength = Object.keys(this.filterForm.searchParam).length
+    // console.log(this.filterLength);
+    this.handleFilterList();
   }
 
   // 表格index改变时
   private handleCurrentChange(val: any) {
-    this.form.current = val;
-    this.filterList();
+    this.filterForm.pageIndex = val;
+    this.getTableList();
   }
 
-  // 查询列表数据
-  private async filterList() {
-    this.listLoading = false;
-    const _self = this;
-    const { data } = await getProductList(this.form);
-
-    this.tableData = data.data;
-    this.total = data.total;
+  // 模拟查询列表数据
+  private getTableList() {
+    this.tableLoading = true;
     setTimeout(() => {
-      this.listLoading = false;
-    }, 0.5 * 1000);
-  }
-  // 搜索列表
-  private getList() {
-    this.form.current = 1;
-    this.filterList();
+      this.tableList = this.tableData;
+      this.tableLoading = false;
+    }, 1 * 1000);
   }
 
-  private selsChange(val: any) {
-    this.form.size = val;
-    this.filterList();
+  // 筛选项展示隐藏
+  private handleFilterExtend() {
+    this.filterExtend = !this.filterExtend
+    this.filterExtendText = this.filterExtend ? '收起' : '展开'
   }
-  // 关闭 dialog 回调
-  private dialogClosed() {
-    for (let key in this.addForm) {
-      if (key == "channelVoList") {
-        this.addForm[key] = [];
-      } else {
-        this.addForm[key] = "";
-      }
+
+  // 筛选列表数据
+  private handleFilterList() {
+    this.filterForm.pageIndex = 1;
+    this.getTableList();
+  }
+
+  // 筛选项重置
+  private handleFilterReset() {
+    (this.$refs.filterForm as ElForm).resetFields();
+    this.filterForm.searchParam = {
+      productCode: '',
+      productName: '',
+      productDate1: '',
+      productDate2: '',
+      productDate3: '',
+      productDate4: '',
+      productStatus: '',
+      productType: ''
+    };
+    this.filterForm.pageIndex = 1;
+    this.getTableList();
+  }
+
+  // 选择展示条数
+  private selsChange(val: any) {
+    this.filterForm.pageSize = val;
+    this.getTableList();
+  }
+
+  // 选择表格项操作
+  toggleSelection(rows: any[]) {
+    if (rows) {
+      rows.forEach((row: any) => {
+        this.multipleTable.toggleRowSelection(row);
+      });
+    } else {
+      this.multipleTable.clearSelection();
     }
-    this.channelVoList = [];
-    this.multiChannel = [];
-    this.singleChannel = [];
+  }
+
+  // 选择表格项操作
+  handleSelectionChange(val: any) {
+    this.multipleSelection = val;
+    // console.log(this.multipleSelection);
+  }
+
+  // 编辑表格选项
+  handleEditItem() {
+    this.$router.push('/components/form')
+  }
+
+  // 删除表格选项
+  handleDeleteItem() {
+    this.$confirm('此操作将永久删除该选项, 是否继续?', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(() => {
+      this.$message({
+        type: 'success',
+        message: '删除成功!'
+      });
+    }).catch(() => {
+      this.$message({
+        type: 'info',
+        message: '已取消删除'
+      });
+    });
+  }
+
+  // 显示表单弹层
+  handleShowDialogForm() {
+    this.dialogForms = true;
+  }
+
+  // 关闭表单弹层
+  handleCloseDialogForm() {
+    this.dialogForms = false;
+  }
+
+  // 显示表单弹层
+  handleShowDialogDetail() {
+    this.dialogDetails = true;
+  }
+
+  // 关闭弹层
+  handleCloseDialogDetail() {
+    this.dialogDetails = false;
+  }
+
+  // 提交表单项
+  private handleSubmitForm() {
+    (this.$refs.dialogForm as ElForm).validate(async (valid: boolean) => {
+      if (valid) {
+        this.loading = true;
+        this.$message('submit!')
+        setTimeout(() => {
+          this.loading = false;
+        }, 0.5 * 1000);
+      } else {
+        return false;
+      }
+    })
   }
 }
 </script>
 
 <style lang="scss">
-.order {
-  &-container {
-    margin: 20px;
-  }
-
-  &-header {
-    padding: 20px;
-    background: #fff;
-    margin-bottom: 20px;
-    border-radius: 4px;
-  }
-
-  &-filter {
-    padding: 20px 20px 0 20px;
-    background: #fff;
-    margin-bottom: 20px;
-    border-radius: 3px;
-  }
-
-  &-table {
-    padding: 20px;
-    background: #fff;
-    margin-bottom: 20px;
-    border-radius: 4px;
-    .table-tools {
-      margin-bottom: 20px;
-    }
-  }
-}
-.el-form-item{
-  margin-right: 20px !important;
-}
-.size-input {
-  width: 300px;
-}
-.from-item-left {
-  padding-left: 50px;
-}
-.table-pagination {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  margin-top: 20px;
-}
-
-.dynamic-tips {
-  // width: 400px;
-  padding-left: 20px;
-  color: rgb(73, 157, 242);
-  line-height: 30px;
-  border: 1px solid rgb(73, 157, 242);
-  margin-bottom: 10px;
-}
-.details-content {
-  padding-left: 20px;
-  text-align: left;
-  size: 14px;
-  line-height: 30px;
-}
-.details-content:nth-child(even) {
-  background-color: rgb(245, 245, 245);
-}
-.icon-box {
-  display: inline-block;
-  margin-left: 15px;
-  .el-icon-warning {
-    font-size: 50px;
-    line-height: 30px;
-    color: yellow;
-  }
-  .el-icon-success {
-    font-size: 50px;
-    line-height: 30px;
-    color: #67c23a;
-  }
-}
-.text-content {
-  display: inline-block;
-  line-height: 20px;
-  font-size: 14px;
-  margin-left: 40px;
-  margin-top: -40px;
-  .text-title {
-    font-size: 24px;
-  }
-  .end-text {
-    margin-left: 60px;
-  }
-}
-
-// .customerName {
-//   color: #108ee9;
-// }
-
-.el-table td,
-.el-table th {
-  text-align: center;
-}
-.el-dialog__body {
-  padding: 5px 20px 20px 20px;
-  color: #1f2d3d;
-  font-size: 14px;
-  word-break: break-all;
-}
-.el-dialog__footer {
-  padding: 0px 20px 20px 20px;
-  text-align: center;
-  box-sizing: border-box;
-}
 </style>

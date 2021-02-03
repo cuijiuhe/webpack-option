@@ -87,14 +87,15 @@ export default class extends Vue {
 .app-breadcrumb.el-breadcrumb {
   display: inline-block;
   font-size: $fontSizeNormal;
-  line-height: 48px;
+  line-height: $gapLarger;
   margin-left: $gapNormal;
-
   .el-breadcrumb__inner,
   .el-breadcrumb__inner a {
-    font-weight: 400 !important;
+    font-weight: $fontWeightNormal !important;
   }
-
+  .el-breadcrumb__separator {
+    margin: 0 $gapMini !important;
+  }
   .no-redirect {
     color: $textColorSecondary;
     cursor: text;
