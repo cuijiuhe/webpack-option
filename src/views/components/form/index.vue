@@ -3,7 +3,7 @@
   <div class="mod-page">
     <!-- 表单  -->
     <el-card class="mod-card mod-form">
-      <div class="mod-card-header">
+      <div class="mod-card-header" slot="header">
         <h2 class="mod-card-title">表单标题</h2>
       </div>
       <div class="mod-card-body">
