@@ -198,10 +198,94 @@ Modern browsers and Internet Explorer 10+.
 | --------- | --------- | --------- | --------- |
 | IE10, IE11, Edge| last 2 versions| last 2 versions| last 2 versions
 
-## 参与贡献
+## 样式替换
 
-请看 [CONTRIBUTING.md](https://github.com/Armour/vue-typescript-admin-template/blob/master/.github/CONTRIBUTING.md)
+### 和设计师确定UI规范
 
-## License
+### 前端项目公共部分调整
 
-[MIT License](https://github.com/Armour/vue-typescript-admin-template/blob/master/LICENSE)
+#### 在 element-ui 官网主题定制方案并根据UI规范进行相关属性调整
+
+#### 下载调整完成的方案，解压文件，在项目中使用
+
+将 `index.css` 文件及字体文件夹保存在  `@/styles/`。
+引用可在 `main.ts`中使用
+
+```js
+# main.ts
+
+import '@/styles/index.css'
+
+```
+
+#### 覆盖自定义主题样式
+
+在原有主题样式文件中，覆盖相应的属性值。
+
+文件路径为：`src/styles/element-variables.scss`，详见文件需改。
+
+#### 更新项目样式变量文件
+
+为了在项目中能够统一使用UI规范定义的内容，在项目中统一定义了通用的样式变量和组件变量。
+
+文件路径为：`src/styles/_variables.scss`，详见文件需改。
+
+以上文件均在`/src/styles`目录下，调整项目时，可覆盖整个目录。
+
+### 前端项目业务页面调整
+
+#### 公共资源文件更新
+
+需要从组件库项目中拷贝相关文件到自己的项目中进行覆盖，主要包括：
+
+* styles文件夹：公共样式文件；
+* asstes文件夹：静态资源，主要包括登录页相关的图片；
+* components文件夹：公共组件库目录；
+* layout文件夹：公共布局组件文件；修改 `src/layout/components/Sidebar/index.vue` 文件中 `title` 值为项目名称；
+* `main.ts`文件：替换引入的样式文件；
+
+```js
+# 自定义element-ui主题样式
+import '@/styles/index.css'
+
+# 重置element-ui主题样式
+import '@/styles/element-variables.scss'
+
+# 公共样式，包括重置系统样式和组件样式及公共组件布局样式
+import '@/styles/common.scss'
+```
+
+* `login.vue`文件：替换整个文件，如果特殊修改可进行差异性替换。
+* `404.vue`文件：替换整个文件，如果特殊修改可进行差异性替换。
+
+### 页面文件更新
+
+#### 列表页
+
+***筛选***：
+
+1. 每行显示三个字段，字段名称右对齐，字段长度限定最长为6个字；
+
+2. 如果字段不足3个，按钮放到字段后面；
+
+3. 如果字段超过2个不足6个，不展示展开选项；
+
+4. 如果字段超过6个，显示展示选项，点击展开所有字段，并改为收起；
+
+***表格***：
+
+1. 所有单元格都左对齐；
+
+2. 所有单元格内容部分都不折行，页头每项的文字要显示完整；
+
+3. 单元格内容，如果能确定内容宽度的，可通过设置宽度让内容显示完整；如果不确定的要保证留有一定宽度；
+
+4. 所有单元格内容如果不足页面最小宽度，一定要保证有一个单元格不设定宽度，让其自然收缩；
+
+5. 操作按钮：
+
+* 非条件显示按钮：如果超过3个按钮，列表默认显示一个按钮+更多，其他按钮在下拉选项中展示；
+
+* 条件显示按钮：因不好控制显示个数，可直接在列表中完全显示。
+
+6. 分页：右对齐
