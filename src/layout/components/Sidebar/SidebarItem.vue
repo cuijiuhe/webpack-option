@@ -158,6 +158,19 @@ export default class extends Vue {
   }
 }
 
+.submenu-title-noDropdown {
+  height: $menuHeight;
+  line-height: $menuHeight;
+  padding: 0 $menuPaddingRight 0 $menuPaddingLeft !important;
+  color: $menuText;
+  font-size: $fontSizeNormal;
+  .svg-icon {
+    width: $menuIconSize !important;
+    height: $menuIconSize !important;
+    margin-right: $menuIconGap !important;
+  }
+}
+
 .full-mode {
   .nest-menu .el-submenu > .el-submenu__title,
   .el-submenu .el-menu-item {
@@ -219,6 +232,13 @@ export default class extends Vue {
         }
       }
     }
+  }
+  .submenu-title-noDropdown {
+    text-align: center;
+  }
+  .submenu-title-noDropdown .svg-icon {
+    display: inline-block;
+    margin: 0;
   }
 }
 </style>
