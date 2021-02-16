@@ -290,6 +290,10 @@ a:hover {
 .el-select {
   width: 100%;
 }
+.el-radio__input.is-checked + .el-radio__label,
+.el-checkbox__input.is-checked + .el-checkbox__label {
+  color: $textColorNormal;
+}
 
 .el-dropdown-menu__item {
   white-space: nowrap;
@@ -331,6 +335,12 @@ a:hover {
     padding: $gapNormal;
   }
 
+  .el-dialog__title {
+    font-size: $fontSizeLarge;
+    font-weight: $fontWeightBold;
+    line-height: 24px;
+  }
+
   .el-dialog__body {
     border: 1px solid $borderColorNormal;
     border-width: 1px 0;
@@ -349,8 +359,8 @@ a:hover {
     padding: 0 !important;
   }
   .el-message-box__title {
-    font-size: $fontSizeLarger;
-    font-weight: $fontWeightNormal;
+    font-size: $fontSizeLarge;
+    font-weight: $fontWeightBold;
     line-height: 24px;
   }
   .el-message-box__headerbtn {
@@ -392,7 +402,7 @@ a:hover {
 
   &-title {
     font-size: $fontSizeLarge;
-    font-weight: $fontWeightNormal;
+    font-weight: $fontWeightBold;
     line-height: 24px;
     margin: 0;
     padding: 0;
@@ -579,6 +589,10 @@ a:hover {
 
   .mod-card-header {
     justify-content: center;
+  }
+
+  .mod-card-title {
+    font-weight: $fontWeightNormal;
   }
 
   .mod-form {

@@ -7,6 +7,8 @@
         <h2 class="mod-card-title">基本信息</h2>
         <div class="mod-card-tool">
           <el-button type="text" size="small">操作按钮</el-button>
+          <el-button size="small">操作按钮</el-button>
+          <el-button type="primary" size="small">操作按钮</el-button>
         </div>
       </div>
       <ul class="mod-list">
