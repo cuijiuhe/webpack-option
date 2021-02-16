@@ -244,13 +244,12 @@ import '@/styles/index.css'
 * layout文件夹：公共布局组件文件；修改 `src/layout/components/Sidebar/index.vue` 文件中 `title` 值为项目名称；
 * `main.ts`文件：替换引入的样式文件；
 
-```js
-# 自定义element-ui主题样式
-import '@/styles/index.css'
-
+```ts
+# main.ts
 # 重置element-ui主题样式
 import '@/styles/element-variables.scss'
-
+# 自定义element-ui主题样式
+import '@/styles/index.css'
 # 公共样式，包括重置系统样式和组件样式及公共组件布局样式
 import '@/styles/common.scss'
 ```
@@ -289,3 +288,28 @@ import '@/styles/common.scss'
 * 条件显示按钮：因不好控制显示个数，可直接在列表中完全显示。
 
 6. 分页：右对齐
+
+### 2021–02-16更新
+
+#### `main.ts` 文件
+
+调整样式加载顺序，解决样式覆盖问题：
+
+最新的样式顺序为：
+
+```ts
+# main.ts
+
+import '@/styles/element-variables.scss'
+import '@/styles/index.css'
+import '@/styles/common.scss'
+```
+
+#### 登录页
+
+* 增加样式作用域，解决全局样式污染的问题；
+
+#### 列表页
+
+* 针对筛选项不同个数进行样式优化，适配页面展示；
+* 针对弹层中表单项字数超过6个做兼容：折行并垂直居中展示（表单页同理）；
