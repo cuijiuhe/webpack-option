@@ -409,9 +409,14 @@ a:hover {
   flex: none;
   padding: $gapNormal 0;
 
-  .mod-card-body {
+  .mod-card-body-height {
     height: 112px;
     overflow: hidden;
+  }
+
+  .mod-card-body:last-child {
+    height: auto;
+    margin-bottom: -$gapLarge;
   }
 
   .mod-card-body-extend {
@@ -497,14 +502,16 @@ a:hover {
 
   .el-form-item {
     display: flex;
+    align-items: center;
   }
 
   .el-form-item__label {
     flex: none;
     width: 120px;
+    line-height: 22px !important;
     padding-right: $gapNormal;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    word-break: break-all;
+    word-wrap: break-word;
     overflow: hidden;
   }
 
