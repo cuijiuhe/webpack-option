@@ -2,7 +2,7 @@
   <!-- 功能页面  -->
   <div class="mod-page">
     <!-- 详情  -->
-    <el-card class="mod-card mod-detail">
+    <el-card class="mod-card mod-detail" shadow="never">
       <div class="mod-card-header" slot="header">
         <h2 class="mod-card-title">基本信息</h2>
         <div class="mod-card-tool">
@@ -60,7 +60,7 @@
         </li>
       </ul>
     </el-card>
-    <el-card class="mod-card mod-table">
+    <el-card class="mod-card mod-table" shadow="never">
       <div class="mod-card-header" slot="header">
         <h2 class="mod-card-title">商品信息</h2>
       </div>

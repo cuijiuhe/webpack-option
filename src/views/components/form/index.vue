@@ -2,7 +2,7 @@
   <!-- 功能页面  -->
   <div class="mod-page">
     <!-- 表单  -->
-    <el-card class="mod-card mod-form">
+    <el-card class="mod-card mod-form" shadow="never">
       <div class="mod-card-header" slot="header">
         <h2 class="mod-card-title">表单标题</h2>
       </div>
@@ -48,7 +48,7 @@
               <el-checkbox label="单纯品牌曝光" name="type"></el-checkbox>
             </el-checkbox-group>
           </el-form-item>
-          <el-form-item label="特殊资源申请" prop="resource">
+          <el-form-item label="超过六个字的选项名称" prop="resource">
             <el-radio-group v-model="ruleForm.resource">
               <el-radio label="线上品牌商赞助"></el-radio>
               <el-radio label="线下场地免费"></el-radio>

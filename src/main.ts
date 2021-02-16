@@ -4,8 +4,8 @@ import 'normalize.css'
 import ElementUI from 'element-ui'
 import SvgIcon from 'vue-svgicon'
 
-import '@/styles/index.css'
 import '@/styles/element-variables.scss'
+import '@/styles/index.css'
 import '@/styles/common.scss'
 
 import App from '@/App.vue'

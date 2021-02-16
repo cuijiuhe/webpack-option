@@ -234,7 +234,7 @@ export default class extends Vue {
       padding-bottom: 10px;
     }
     .el-form-item__error {
-      left: 16px;
+      left: 12px;
       color: $error;
       font-size: 14px;
       line-height: 22px;
@@ -280,17 +280,19 @@ export default class extends Vue {
       color: #333;
     }
   }
-  @media (max-width: 1440px) and (min-width: 1280px) {
-    .el-form .el-form-item .el-form-item__label,
-    .el-form .el-form-item .el-input {
-      width: 100% !important;
+  @media (max-width: 1440px) and (min-width: 1200px) {
+    .login-container {
+      .el-form .el-form-item .el-form-item__label,
+      .el-form .el-form-item .el-input {
+        width: 100% !important;
+      }
     }
   }
 </style>
 <style lang="scss" scoped>
 $dark_gray:#889aa4;
 .login-container {
-  position: absolute;
+  position: fixed;
   height: 100%;
   width: 100%;
   min-width: 600px;
