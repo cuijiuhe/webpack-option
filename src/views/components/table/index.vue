@@ -2,8 +2,8 @@
   <!-- 功能页面  -->
   <div class="mod-page">
     <!-- 筛选  -->
-    <el-card class="mod-card mod-filter">
-      <div class="mod-card-body" :class="{'mod-card-body-extend': filterExtend}">
+    <el-card class="mod-card mod-filter" shadow="never">
+      <div class="mod-card-body" :class="{'mod-card-body-height': !filterExtend, 'mod-card-body-extend': filterExtend}">
         <el-form
           ref="filterForm"
           :model="filterForm"
@@ -75,7 +75,7 @@
       </div>
     </el-card>
     <!-- 列表  -->
-    <el-card class="mod-card mod-table">
+    <el-card class="mod-card mod-table" shadow="never">
       <div class="mod-card-header" slot="header">
         <h2 class="mod-card-title">列表数据</h2>
         <div class="mod-card-tool">
@@ -170,7 +170,7 @@
       :visible.sync="dialogForms"
       @close="handleCloseDialogForm"
     >
-      <el-card class="mod-card mod-form">
+      <el-card class="mod-card mod-form" shadow="never">
         <div class="mod-card-header" slot="header">
           <h2 class="mod-card-title">表单标题</h2>
         </div>
@@ -217,7 +217,7 @@
                 <el-checkbox label="单纯品牌曝光" name="type"></el-checkbox>
               </el-checkbox-group>
             </el-form-item>
-            <el-form-item label="特殊资源申请" prop="resource">
+            <el-form-item label="特殊资源申请资源申请" prop="resource">
               <el-radio-group v-model="dialogForm.resource">
                 <el-radio label="线上品牌商赞助"></el-radio>
                 <el-radio label="线下场地免费"></el-radio>
@@ -241,7 +241,7 @@
       :visible.sync="dialogDetails"
       @close="handleCloseDialogDetail"
     >
-      <el-card class="mod-card mod-detail">
+      <el-card class="mod-card mod-detail" shadow="never">
         <div class="mod-card-header" slot="header">
           <h2 class="mod-card-title">基本信息</h2>
         </div>
@@ -296,7 +296,7 @@
           </ul>
         </div>
       </el-card>
-      <el-card class="mod-card mod-table">
+      <el-card class="mod-card mod-table" shadow="never">
         <div class="mod-card-header" slot="header">
           <h2 class="mod-card-title">商品信息</h2>
         </div>
@@ -398,7 +398,7 @@ export default class extends Vue {
   // 查询参数个数
   private filterLength = 0;
   // 是否展开筛选项
-  private filterExtend = false;
+  private filterExtend = false; // 筛选项 > 6个
   // 是否展开筛选项按钮内容：展开/收起
   private filterExtendText = '展开';
   // 筛选项表单验证规则
