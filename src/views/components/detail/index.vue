@@ -3,6 +3,7 @@
   <div class="mod-page">
     <!-- 详情  -->
     <el-card class="mod-card mod-detail" shadow="never">
+      <!-- 标题如没有则可以不添加 -->
       <div class="mod-card-header" slot="header">
         <h2 class="mod-card-title">基本信息</h2>
         <div class="mod-card-tool">
@@ -11,54 +12,56 @@
           <el-button type="primary" size="small">操作按钮</el-button>
         </div>
       </div>
-      <ul class="mod-list">
-        <li class="mod-list-item">
-          <span class="mod-list-label">订单编号</span>
-          <el-tooltip
-            effect="dark"
-            :content="detailData.orderCode"
-            placement="top"
-          >
-            <span class="mod-list-value">{{ detailData.orderCode }}</span>
-          </el-tooltip>
-        </li>
-        <li class="mod-list-item">
-          <span class="mod-list-label">订单类型</span>
-          <span class="mod-list-value">
-            {{ detailData.orderType }}
-          </span>
-        </li>
-        <li class="mod-list-item">
-          <span class="mod-list-label">来源渠道</span>
-          <span class="mod-list-value">
-            {{ detailData.orderChannel }}
-          </span>
-        </li>
-        <li class="mod-list-item">
-          <span class="mod-list-label">会员手机号</span>
-          <span class="mod-list-value">
-            {{ detailData.memberPhone }}
-          </span>
-        </li>
-        <li class="mod-list-item">
-          <span class="mod-list-label">会员ID</span>
-          <span class="mod-list-value">
-            {{ detailData.payMember }}
-          </span>
-        </li>
-        <li class="mod-list-item">
-          <span class="mod-list-label">订单创建时间</span>
-          <span class="mod-list-value">
-            {{ detailData.payTime }}
-          </span>
-        </li>
-        <li class="mod-list-item">
-          <span class="mod-list-label">订单完成时间</span>
-          <span class="mod-list-value">
-            {{ detailData.completeTime }}
-          </span>
-        </li>
-      </ul>
+      <div class="mod-card-body">
+        <ul class="mod-list">
+          <li class="mod-list-item">
+            <span class="mod-list-label">订单编号</span>
+            <el-tooltip
+              effect="dark"
+              :content="detailData.orderCode"
+              placement="top"
+            >
+              <span class="mod-list-value">{{ detailData.orderCode }}</span>
+            </el-tooltip>
+          </li>
+          <li class="mod-list-item">
+            <span class="mod-list-label">订单类型</span>
+            <span class="mod-list-value">
+              {{ detailData.orderType }}
+            </span>
+          </li>
+          <li class="mod-list-item">
+            <span class="mod-list-label">来源渠道</span>
+            <span class="mod-list-value">
+              {{ detailData.orderChannel }}
+            </span>
+          </li>
+          <li class="mod-list-item">
+            <span class="mod-list-label">会员手机号</span>
+            <span class="mod-list-value">
+              {{ detailData.memberPhone }}
+            </span>
+          </li>
+          <li class="mod-list-item">
+            <span class="mod-list-label">会员ID</span>
+            <span class="mod-list-value">
+              {{ detailData.payMember }}
+            </span>
+          </li>
+          <li class="mod-list-item">
+            <span class="mod-list-label">订单创建时间</span>
+            <span class="mod-list-value">
+              {{ detailData.payTime }}
+            </span>
+          </li>
+          <li class="mod-list-item">
+            <span class="mod-list-label">订单完成时间</span>
+            <span class="mod-list-value">
+              {{ detailData.completeTime }}
+            </span>
+          </li>
+        </ul>
+      </div>
     </el-card>
     <el-card class="mod-card mod-table" shadow="never">
       <div class="mod-card-header" slot="header">
@@ -95,7 +98,7 @@
             label="产品图片"
             width="105"
           >
-            <template scope="scope">
+            <template slot-scope="scope">
               <el-image
                 :src="scope.row.productImg"
                 fit="cover"
