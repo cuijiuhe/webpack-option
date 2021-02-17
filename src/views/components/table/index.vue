@@ -77,6 +77,7 @@
     <!-- 列表  -->
     <el-card class="mod-card mod-table" shadow="never">
       <div class="mod-card-header" slot="header">
+        <!-- 标题如没有则可以不添加 -->
         <h2 class="mod-card-title">列表数据</h2>
         <div class="mod-card-tool">
           <el-button type="primary" size="small" @click="handleShowDialogForm()">添加列表</el-button>
@@ -242,6 +243,7 @@
       @close="handleCloseDialogDetail"
     >
       <el-card class="mod-card mod-detail" shadow="never">
+        <!-- 标题如没有则可以不添加 -->
         <div class="mod-card-header" slot="header">
           <h2 class="mod-card-title">基本信息</h2>
         </div>
@@ -297,6 +299,7 @@
         </div>
       </el-card>
       <el-card class="mod-card mod-table" shadow="never">
+        <!-- 标题如没有则可以不添加 -->
         <div class="mod-card-header" slot="header">
           <h2 class="mod-card-title">商品信息</h2>
         </div>
