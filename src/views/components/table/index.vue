@@ -698,13 +698,7 @@ export default class extends Vue {
     (this.$refs.filterForm as ElForm).resetFields();
     this.filterForm.searchParam = {
       productCode: '',
-      productName: '',
-      productDate1: '',
-      productDate2: '',
-      productDate3: '',
-      productDate4: '',
-      productStatus: '',
-      productType: ''
+      productName: ''
     };
     this.filterForm.pageIndex = 1;
     this.getTableList();
