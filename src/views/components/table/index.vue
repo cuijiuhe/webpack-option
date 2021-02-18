@@ -3,7 +3,7 @@
   <div class="mod-page">
     <!-- 筛选  -->
     <el-card class="mod-card mod-filter" shadow="never">
-      <div class="mod-card-body" :class="{'mod-card-body-height': !filterExtend, 'mod-card-body-extend': filterExtend}">
+      <div class="mod-card-body" :class="{'mod-card-body-height': filterLength > 3 && !filterExtend, 'mod-card-body-extend': filterExtend}">
         <el-form
           ref="filterForm"
           :model="filterForm"
@@ -24,8 +24,86 @@
               clearable
             ></el-input>
           </el-form-item>
+          <el-form-item v-if="filterLength < 3">
+            <el-button type="default" size="small" @click="handleFilterReset()">重置</el-button>
+            <el-button type="primary" size="small" @click="handleFilterList()">查询</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+      <div v-if="filterLength >= 3" class="mod-card-footer">
+        <el-button v-if="filterLength > 6" type="text" size="small" @click="handleFilterExtend()">{{ filterExtendText }}<i :class="[filterExtend ? 'el-icon-arrow-up' : 'el-icon-arrow-down']"></i></el-button>
+        <el-button type="default" size="small" @click="handleFilterReset()">重置</el-button>
+        <el-button type="primary" size="small" @click="handleFilterList()">查询</el-button>
+      </div>
+    </el-card>
+    <el-card class="mod-card mod-filter" shadow="never">
+      <div class="mod-card-body" :class="{'mod-card-body-height': filter2Length > 3 && !filter2Extend, 'mod-card-body-extend': filter2Extend}">
+        <el-form
+          ref="filter2Form"
+          :model="filter2Form"
+          label-position="right"
+          size="small"
+        >
+          <el-form-item label="产品名称">
+            <el-input
+              v-model="filter2Form.searchParam.productName"
+              placeholder="请输入产品名称"
+              clearable
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="产品编码">
+            <el-input
+              v-model="filter2Form.searchParam.productCode"
+              placeholder="请输入产品编码"
+              clearable
+            ></el-input>
+          </el-form-item>
           <el-form-item label="产品状态">
-            <el-select v-model="filterForm.searchParam.productStatus " placeholder="请选择" clearable>
+            <el-select v-model="filter2Form.searchParam.productStatus " placeholder="请选择" clearable>
+              <el-option
+                v-for="item in productStatus"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item v-if="filter2Length < 3">
+            <el-button type="default" size="small" @click="handleFilterReset()">重置</el-button>
+            <el-button type="primary" size="small" @click="handleFilterList()">查询</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+      <div v-if="filter2Length >= 3" class="mod-card-footer">
+        <el-button v-if="filter2Length > 6" type="text" size="small" @click="handleFilterExtend()">{{ filter2ExtendText }}<i :class="[filter2Extend ? 'el-icon-arrow-up' : 'el-icon-arrow-down']"></i></el-button>
+        <el-button type="default" size="small" @click="handleFilterReset()">重置</el-button>
+        <el-button type="primary" size="small" @click="handleFilterList()">查询</el-button>
+      </div>
+    </el-card>
+    <el-card class="mod-card mod-filter" shadow="never">
+      <div class="mod-card-body" :class="{'mod-card-body-height': filter3Length > 3 && !filter3Extend, 'mod-card-body-extend': filter3Extend}">
+        <el-form
+          ref="filter3Form"
+          :model="filter3Form"
+          label-position="right"
+          size="small"
+        >
+          <el-form-item label="产品名称">
+            <el-input
+              v-model="filter3Form.searchParam.productName"
+              placeholder="请输入产品名称"
+              clearable
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="产品编码">
+            <el-input
+              v-model="filter3Form.searchParam.productCode"
+              placeholder="请输入产品编码"
+              clearable
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="产品状态">
+            <el-select v-model="filter3Form.searchParam.productStatus " placeholder="请选择" clearable>
               <el-option
                 v-for="item in productStatus"
                 :key="item.value"
@@ -36,40 +114,40 @@
           </el-form-item>
           <el-form-item label="计划开始时间">
             <el-date-picker
-              v-model="filterForm.searchParam.productDate1"
+              v-model="filter3Form.searchParam.productDate1"
               type="date"
               placeholder="选择日期">
             </el-date-picker>
           </el-form-item>
           <el-form-item label="计划结束时间">
             <el-date-picker
-              v-model="filterForm.searchParam.productDate2"
+              v-model="filter3Form.searchParam.productDate2"
               type="date"
               placeholder="选择日期">
             </el-date-picker>
           </el-form-item>
           <el-form-item label="实际开始时间">
             <el-date-picker
-              v-model="filterForm.searchParam.productDate3"
+              v-model="filter3Form.searchParam.productDate3"
               type="date"
               placeholder="选择日期">
             </el-date-picker>
           </el-form-item>
           <el-form-item label="实际结束时间">
             <el-date-picker
-              v-model="filterForm.searchParam.productDate4"
+              v-model="filter3Form.searchParam.productDate4"
               type="date"
               placeholder="选择日期">
             </el-date-picker>
           </el-form-item>
-          <el-form-item v-if="filterLength < 3">
+          <el-form-item v-if="filter3Length < 3">
             <el-button type="default" size="small" @click="handleFilterReset()">重置</el-button>
             <el-button type="primary" size="small" @click="handleFilterList()">查询</el-button>
           </el-form-item>
         </el-form>
       </div>
-      <div v-if="filterLength >= 3" class="mod-card-footer">
-        <el-button v-if="filterLength > 6" type="text" size="small" @click="handleFilterExtend()">{{ filterExtendText }}<i :class="[filterExtend ? 'el-icon-arrow-up' : 'el-icon-arrow-down']"></i></el-button>
+      <div v-if="filter3Length >= 3" class="mod-card-footer">
+        <el-button v-if="filter3Length > 6" type="text" size="small" @click="handleFilterExtend()">{{ filter3ExtendText }}<i :class="[filter3Extend ? 'el-icon-arrow-up' : 'el-icon-arrow-down']"></i></el-button>
         <el-button type="default" size="small" @click="handleFilterReset()">重置</el-button>
         <el-button type="primary" size="small" @click="handleFilterList()">查询</el-button>
       </div>
@@ -387,6 +465,40 @@ export default class extends Vue {
   private filterForm = {
     searchParam: {
       productCode: '',
+      productName: ''
+    },
+    pageIndex: 1,
+    pageSize: 10,
+  };
+    // 查询参数个数
+  private filterLength = 0;
+  // 是否展开筛选项
+  private filterExtend = false; // 筛选项 > 6个
+  // 是否展开筛选项按钮内容：展开/收起
+  private filterExtendText = '展开';
+
+  // 查询参数
+  private filter2Form = {
+    searchParam: {
+      productCode: '',
+      productName: '',
+      productStatus: ''
+    },
+    pageIndex: 1,
+    pageSize: 10,
+  };
+
+  // 查询参数个数
+  private filter2Length = 0;
+  // 是否展开筛选项
+  private filter2Extend = false; // 筛选项 > 6个
+  // 是否展开筛选项按钮内容：展开/收起
+  private filter2ExtendText = '展开';
+
+// 查询参数
+  private filter3Form = {
+    searchParam: {
+      productCode: '',
       productName: '',
       productDate1: '',
       productDate2: '',
@@ -398,37 +510,13 @@ export default class extends Vue {
     pageIndex: 1,
     pageSize: 10,
   };
-  // 查询参数个数
-  private filterLength = 0;
+    // 查询参数个数
+  private filter3Length = 0;
   // 是否展开筛选项
-  private filterExtend = false; // 筛选项 > 6个
+  private filter3Extend = false; // 筛选项 > 6个
   // 是否展开筛选项按钮内容：展开/收起
-  private filterExtendText = '展开';
-  // 筛选项表单验证规则
-  private filterformRules: any = {
-    productName: [
-      { required: true, message: "请输入产品名称", trigger: "blur" },
-      { min: 2, max: 50, message: "请输入2-50个汉字", trigger: "blur" },
-    ],
-    productCode: [{ required: true, message: "请选择状态", trigger: "change" }],
-    productStatus: [
-      { required: true, message: "请选择状态", trigger: "change" },
-    ],
-    settlementStandard: [
-      { required: true, message: "请选择结算标准", trigger: "change" },
-    ],
-    excitationType: [
-      { required: true, message: "请选择激励方式", trigger: "change" },
-    ],
-    channel: [
-      {
-        required: true,
-        message: "请选择是否区分用户渠道奖励",
-        trigger: "change",
-      },
-    ],
-    settlementCycle: [{ validator: this.checkAge, trigger: "blur" }],
-  };
+  private filter3ExtendText = '展开';
+
   // 列表数据
   private tableData = [{
     date: '2016-05-01',
@@ -572,7 +660,9 @@ export default class extends Vue {
   mounted() {
     this.multipleTable = this.$refs.multipleTable;
     this.filterLength = Object.keys(this.filterForm.searchParam).length
-    // console.log(this.filterLength);
+    this.filter2Length = Object.keys(this.filter2Form.searchParam).length
+    this.filter3Length = Object.keys(this.filter3Form.searchParam).length
+    console.log(this.filter2Length);
     this.handleFilterList();
   }
 
@@ -593,8 +683,8 @@ export default class extends Vue {
 
   // 筛选项展示隐藏
   private handleFilterExtend() {
-    this.filterExtend = !this.filterExtend
-    this.filterExtendText = this.filterExtend ? '收起' : '展开'
+    this.filter3Extend = !this.filter3Extend
+    this.filter3ExtendText = this.filter3Extend ? '收起' : '展开'
   }
 
   // 筛选列表数据
