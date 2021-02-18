@@ -313,3 +313,29 @@ import '@/styles/common.scss'
 
 * 针对筛选项不同个数进行样式优化，适配页面展示；
 * 针对弹层中表单项字数超过6个做兼容：折行并垂直居中展示（表单页同理）；
+
+### 2021–02-18 更新
+
+#### `common.scss` 文件
+
+针对筛选项表单元素的最大宽度进行调整，适配到 1920px 的 分辨率屏幕。
+
+```css
+.el-input,
+  .el-date-editor.el-input,
+  .el-date-editor.el-input__inner,
+  .el-date-picker,
+  .el-select {
+    width: 100%;
+    max-width: 382px;
+  }
+```
+
+#### 列表页
+
+针对筛选项为 3 个情况下的展示适配。
+
+```html
+# table/index.vue
+<div class="mod-card-body" :class="{'mod-card-body-height': filterLength > 3 && !filterExtend, 'mod-card-body-extend': filterExtend}">
+```
