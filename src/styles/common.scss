@@ -162,6 +162,15 @@ input[type="search"]::-webkit-search-decoration {
   -webkit-appearance: none;
 }
 
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 input:focus {
   outline: none;
 }
@@ -169,7 +178,7 @@ input:focus {
 select[size],
 select[multiple],
 select[size][multiple] {
-  border: 1px solid #AAA;
+  border: 1px solid #aaa;
   padding: 0;
 }
 
