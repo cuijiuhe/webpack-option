@@ -11,9 +11,9 @@ module.exports = {
   devServer: {
     proxy: {
       // projectApi 为项目接口代理路径，用于本地开发，开发时改为相应项目对应的名称，比如：shareApi
-      '^/shareApi': {
+      '^/projectApi': {
         target: 'http://10.100.2.159:8188',
-        pathRewrite: { '^/shareApi': '' },
+        pathRewrite: { '^/projectApi': '' },
         ws: true,
         changeOrigin: true
       }
