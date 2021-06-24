@@ -16,16 +16,27 @@
       "jest",
       "webpack-env"
     ],
+    // "paths": {
+    //   "@/*": [
+    //     "src/*"
+    //   ]
+    // },
     "paths": {
-      "@/*": [
-        "src/*"
-      ]
+      "@core": ["src/core"],
+      "@interfaces": ["src/interfaces"],
+      "@decorators": ["src/decorators"],
+      "@constants": ["src/constants"],
+      "@common": ["src/common"],
+      "@services": ["src/services"],
+      "@utils": ["src/utils"]
     },
     "lib": [
       "esnext",
       "dom",
       "dom.iterable",
-      "scripthost"
+      "scripthost",
+      "DOM",
+      "ES2020"
     ]
   },
   "include": [
